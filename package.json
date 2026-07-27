@@ -3,10 +3,10 @@
   "version": "1.0.0",
   "description": "Compra/Venta USD - BCV → Zinli → Binance",
   "scripts": {
-    "build": "cd frontend && npm install && npx ng build --configuration=production",
-    "start": "cd backend && npm install && node index.js"
+    "build": "cd frontend && npm install --legacy-peer-deps && npx ng build --configuration=production --output-path=dist/frontend/browser",
+    "start": "cd backend && npm install --legacy-peer-deps && node index.js"
   },
   "engines": {
-    "node": ">=18"
+    "node": "20.x"
   }
 }

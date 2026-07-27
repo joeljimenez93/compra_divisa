@@ -15,7 +15,18 @@ app.use(cors());
 app.use(express.json({ limit: '10mb' }));
 
 // Servir frontend en producción
-const frontendPath = path.join(__dirname, '..', 'frontend', 'dist', 'frontend', 'browser');
+const posiblesPaths = [
+  path.join(__dirname, '..', 'frontend', 'dist', 'frontend', 'browser'),
+  path.join(__dirname, '..', 'frontend', 'dist', 'frontend'),
+  path.join(__dirname, 'dist', 'frontend')
+];
+let frontendPath = posiblesPaths.find(p => require('fs').existsSync(path.join(p, 'index.html')));
+if (!frontendPath) {
+  frontendPath = posiblesPaths[0];
+  console.log('⚠️ Frontend no encontrado, sirviendo solo API');
+} else {
+  console.log('📁 Frontend encontrado en:', frontendPath);
+}
 app.use(express.static(frontendPath));
 
 // ── Helpers ──────────────────────────────────────────────

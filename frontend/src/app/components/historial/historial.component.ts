@@ -25,6 +25,11 @@ export class HistorialComponent implements OnInit {
   guardandoEdit = false;
   mensajeEdit = '';
 
+  // Calculadora
+  calcVisible: string = '';  // 'zinli' o 'venta'
+  calcExpresion: string = '';
+  calcResultado: string = '';
+
   ngOnInit() {
     this.cargar();
   }
@@ -124,6 +129,41 @@ export class HistorialComponent implements OnInit {
         this.editFotoVentaNombre = file.name;
       };
       reader.readAsDataURL(file);
+    }
+  }
+
+  toggleCalc(campo: string) {
+    this.calcVisible = this.calcVisible === campo ? '' : campo;
+    this.calcExpresion = '';
+    this.calcResultado = '';
+  }
+
+  calcBoton(valor: string) {
+    if (valor === 'C') {
+      this.calcExpresion = '';
+      this.calcResultado = '';
+    } else if (valor === '=') {
+      try {
+        const resultado = eval(this.calcExpresion);
+        this.calcResultado = parseFloat(resultado.toFixed(4)).toString();
+      } catch {
+        this.calcResultado = 'Error';
+      }
+    } else if (valor === '←') {
+      this.calcExpresion = this.calcExpresion.slice(0, -1);
+    } else {
+      this.calcExpresion += valor;
+    }
+  }
+
+  calcUsarResultado() {
+    if (this.calcResultado && this.calcResultado !== 'Error') {
+      if (this.calcVisible === 'zinli') {
+        this.editComisionZinliBs = parseFloat(this.calcResultado);
+      } else if (this.calcVisible === 'venta') {
+        this.editVentaBinanceBs = parseFloat(this.calcResultado);
+      }
+      this.toggleCalc('');
     }
   }
 

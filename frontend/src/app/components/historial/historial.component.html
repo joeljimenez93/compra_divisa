@@ -140,8 +140,25 @@
               <input type="number" [(ngModel)]="editComisionZinliPct" step="0.1" min="0" max="20" class="input-small" />
             </div>
             <div class="edit-field">
-              <label>Comisión Zinli (USD)</label>
+              <label>Comisión Zinli (USD) 
+                <button class="btn-calc-toggle" (click)="toggleCalc('zinli')">🧮</button>
+              </label>
               <input type="number" [(ngModel)]="editComisionZinliBs" step="0.01" min="0" class="input-small" placeholder="Monto en USD" />
+              <!-- Calculadora Zinli -->
+              <div class="calc-popup" *ngIf="calcVisible === 'zinli'">
+                <div class="calc-display">
+                  <div class="calc-expr">{{ calcExpresion || '0' }}</div>
+                  <div class="calc-res" *ngIf="calcResultado">= {{ calcResultado }}</div>
+                </div>
+                <div class="calc-grid">
+                  <button (click)="calcBoton('7')">7</button><button (click)="calcBoton('8')">8</button><button (click)="calcBoton('9')">9</button><button (click)="calcBoton('/')">/</button>
+                  <button (click)="calcBoton('4')">4</button><button (click)="calcBoton('5')">5</button><button (click)="calcBoton('6')">6</button><button (click)="calcBoton('*')">*</button>
+                  <button (click)="calcBoton('1')">1</button><button (click)="calcBoton('2')">2</button><button (click)="calcBoton('3')">3</button><button (click)="calcBoton('-')">-</button>
+                  <button (click)="calcBoton('0')">0</button><button (click)="calcBoton('.')">.</button><button (click)="calcBoton('C')">C</button><button (click)="calcBoton('+')">+</button>
+                  <button (click)="calcBoton('←')" class="calc-del">←</button><button (click)="calcBoton('=')" class="calc-eq" style="grid-column: span 2;">=</button>
+                </div>
+                <button class="calc-usar" (click)="calcUsarResultado()" [disabled]="!calcResultado || calcResultado === 'Error'">✅ Usar resultado</button>
+              </div>
             </div>
           </div>
           <div class="edit-row">
@@ -150,8 +167,25 @@
               <input type="number" [(ngModel)]="editTasaBinance" step="0.01" min="0" class="input-small" placeholder="Tasa de venta" />
             </div>
             <div class="edit-field">
-              <label>Venta en Binance (Bs)</label>
+              <label>Venta en Binance (Bs) 
+                <button class="btn-calc-toggle" (click)="toggleCalc('venta')">🧮</button>
+              </label>
               <input type="number" [(ngModel)]="editVentaBinanceBs" step="0.01" min="0" class="input-small" placeholder="Monto real vendido" />
+              <!-- Calculadora Venta -->
+              <div class="calc-popup" *ngIf="calcVisible === 'venta'">
+                <div class="calc-display">
+                  <div class="calc-expr">{{ calcExpresion || '0' }}</div>
+                  <div class="calc-res" *ngIf="calcResultado">= {{ calcResultado }}</div>
+                </div>
+                <div class="calc-grid">
+                  <button (click)="calcBoton('7')">7</button><button (click)="calcBoton('8')">8</button><button (click)="calcBoton('9')">9</button><button (click)="calcBoton('/')">/</button>
+                  <button (click)="calcBoton('4')">4</button><button (click)="calcBoton('5')">5</button><button (click)="calcBoton('6')">6</button><button (click)="calcBoton('*')">*</button>
+                  <button (click)="calcBoton('1')">1</button><button (click)="calcBoton('2')">2</button><button (click)="calcBoton('3')">3</button><button (click)="calcBoton('-')">-</button>
+                  <button (click)="calcBoton('0')">0</button><button (click)="calcBoton('.')">.</button><button (click)="calcBoton('C')">C</button><button (click)="calcBoton('+')">+</button>
+                  <button (click)="calcBoton('←')" class="calc-del">←</button><button (click)="calcBoton('=')" class="calc-eq" style="grid-column: span 2;">=</button>
+                </div>
+                <button class="calc-usar" (click)="calcUsarResultado()" [disabled]="!calcResultado || calcResultado === 'Error'">✅ Usar resultado</button>
+              </div>
             </div>
           </div>
           <!-- Foto venta -->

@@ -87,7 +87,8 @@
           "ganancia_porcentaje": 12.24
         }
       ],
-      "tasa_binance_efectiva": 851.7782
+      "tasa_binance_efectiva": 851.7782,
+      "estado": "confirmada"
     },
     {
       "id": 1785148251509,

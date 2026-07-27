@@ -105,6 +105,14 @@ export class HistorialComponent implements OnInit {
     });
   }
 
+  confirmarOperacion(id: number, event: Event) {
+    event.stopPropagation();
+    this.api.toggleEstado(id).subscribe({
+      next: () => this.cargar(),
+      error: () => this.error = 'Error al cambiar estado'
+    });
+  }
+
   eliminar(id: number, event: Event) {
     event.stopPropagation();
     if (!confirm('¿Eliminar esta operación?')) return;

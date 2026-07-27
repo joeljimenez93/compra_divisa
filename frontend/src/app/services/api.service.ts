@@ -44,6 +44,7 @@ export interface Operacion {
   comision_zinli_porcentaje: number;
   foto_compra?: string | null;
   foto_venta?: string | null;
+  estado?: string;
   detalle: {
     costo_base_bs?: number;
     comision_divisas_bs?: number;
@@ -116,6 +117,10 @@ export class ApiService {
 
   updateOperacion(id: number, data: { comision_zinli_porcentaje?: number; comision_zinli_bs?: number; venta_binance_bs?: number }): Observable<{ ok: boolean; operacion: Operacion }> {
     return this.http.put<{ ok: boolean; operacion: Operacion }>(`${API}/operaciones/${id}`, data);
+  }
+
+  toggleEstado(id: number): Observable<{ ok: boolean; estado: string }> {
+    return this.http.put<{ ok: boolean; estado: string }>(`${API}/operaciones/${id}/estado`, {});
   }
 
   getConfig(): Observable<{ ok: boolean; config: Config }> {

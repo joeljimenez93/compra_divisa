@@ -407,6 +407,7 @@ app.post('/api/operaciones', async (req, res) => {
       comision_zinli_porcentaje: comisionZinliPct,
       foto_compra: foto_compra || null,
       foto_venta: foto_venta || null,
+      estado: 'pendiente',
       detalle: {
         costo_base_bs: +costoBaseBs.toFixed(2),
         comision_divisas_bs: +comisionDivisasBs.toFixed(2),
@@ -482,6 +483,16 @@ app.delete('/api/operaciones/:id', (req, res) => {
   const eliminada = db.operaciones.splice(idx, 1)[0];
   guardarDB(db);
   res.json({ ok: true, mensaje: 'Operación eliminada', operacion: eliminada });
+});
+
+// PUT cambiar estado (pendiente/confirmada)
+app.put('/api/operaciones/:id/estado', authMiddleware, (req, res) => {
+  const db = leerDB();
+  const op = db.operaciones.find(o => o.id === +req.params.id);
+  if (!op) return res.status(404).json({ ok: false, error: 'Operación no encontrada' });
+  op.estado = op.estado === 'confirmada' ? 'pendiente' : 'confirmada';
+  guardarDB(db);
+  res.json({ ok: true, estado: op.estado });
 });
 
 // PUT actualizar comisión Zinli de una operación

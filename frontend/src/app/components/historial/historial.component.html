@@ -55,6 +55,9 @@
       <div class="op-header">
         <div class="op-info">
           <span class="op-id">#{{ op.id }}</span>
+          <span class="estado-badge" [class.pendiente]="op.estado !== 'confirmada'" [class.confirmada]="op.estado === 'confirmada'">
+            {{ op.estado === 'confirmada' ? '✅ Confirmada' : '⏳ Pendiente' }}
+          </span>
           <span class="op-fecha">📅 {{ formatearFecha(op.fecha) }}</span>
             <span class="op-fuente" *ngIf="op.fuente_bcv?.includes('Manual')">✏️ Tasas manuales</span>
         </div>
@@ -67,6 +70,9 @@
           </span>
         </div>
         <div class="op-actions">
+          <button class="btn-confirm" (click)="confirmarOperacion(op.id, $event)" [title]="op.estado === 'confirmada' ? 'Marcar pendiente' : 'Confirmar operación'">
+            {{ op.estado === 'confirmada' ? '✅' : '⬜' }}
+          </button>
           <button class="btn-edit" (click)="abrirEdicion(op, $event)" title="Editar comisión Zinli">✏️</button>
           <button class="btn-delete" (click)="eliminar(op.id, $event)" title="Eliminar">🗑️</button>
           <span class="expand-icon">{{ operacionExpandida === op.id ? '▲' : '▼' }}</span>

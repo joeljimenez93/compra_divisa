@@ -25,6 +25,9 @@
       <span class="rb-num" [class.text-green]="data.resumen.total_ganancia_bs >= 0" [class.text-red]="data.resumen.total_ganancia_bs < 0">
         Bs {{ data.resumen.total_ganancia_bs.toLocaleString() }}
       </span>
+      <span class="rb-num-small" [class.text-green]="data.resumen.total_ganancia_bs >= 0">
+        ≈ ${{ (data.resumen.total_ganancia_usd || 0).toFixed(2) }} USD
+      </span>
       <span class="rb-label">Ganancia total</span>
     </div>
     <div class="rb-item">
@@ -59,6 +62,7 @@
           <span class="op-usd">${{ op.monto_usd.toLocaleString() }} USD</span>
           <span class="op-ganancia" [class.positivo]="op.detalle.ganancia_bs >= 0" [class.negativo]="op.detalle.ganancia_bs < 0">
             {{ op.detalle.ganancia_bs >= 0 ? '+' : '' }}Bs {{ op.detalle.ganancia_bs.toLocaleString() }}
+            <small>(${{ (op.detalle.ganancia_usd || 0).toFixed(2) }} USD)</small>
             ({{ op.detalle.ganancia_porcentaje >= 0 ? '+' : '' }}{{ op.detalle.ganancia_porcentaje }}%)
           </span>
         </div>
@@ -119,6 +123,9 @@
             <span class="dg-label">Ganancia Neta</span>
             <span class="dg-val" [class.text-green]="op.detalle.ganancia_bs >= 0" [class.text-red]="op.detalle.ganancia_bs < 0">
               Bs {{ op.detalle.ganancia_bs.toLocaleString() }}
+            </span>
+            <span class="dg-val-usd" [class.text-green]="op.detalle.ganancia_bs >= 0">
+              ≈ ${{ (op.detalle.ganancia_usd || 0).toFixed(2) }} USD
             </span>
           </div>
         </div>

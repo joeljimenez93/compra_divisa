@@ -24,6 +24,7 @@ export interface TasasResponse {
     usd_disponible: number;
     venta_binance_bs: number;
     ganancia_bs: number;
+    ganancia_usd?: number;
     ganancia_porcentaje: number;
     spread: number;
   };
@@ -51,6 +52,7 @@ export interface Operacion {
     usd_disponible?: number;
     venta_binance_bs: number;
     ganancia_bs: number;
+    ganancia_usd?: number;
     ganancia_porcentaje: number;
     spread: number;
   };
@@ -65,6 +67,7 @@ export interface OperacionesResponse {
     total_bs_invertidos: number;
     total_bs_vendidos: number;
     total_ganancia_bs: number;
+    total_ganancia_usd?: number;
     ganancia_promedio_porcentaje: number;
   };
   operaciones: Operacion[];

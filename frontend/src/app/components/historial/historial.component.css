@@ -37,6 +37,7 @@
 }
 .rb-item.highlight { background: #0f172a; }
 .rb-num { display: block; font-size: 1rem; font-weight: 700; color: #f8fafc; font-family: 'Courier New', monospace; }
+.rb-num-small { display: block; font-size: 0.7rem; color: #94a3b8; font-family: 'Courier New', monospace; margin-top: 1px; }
 .rb-label { display: block; font-size: 0.7rem; color: #64748b; margin-top: 2px; }
 
 .text-green { color: #22c55e !important; }
@@ -136,6 +137,8 @@
 .dg-label { display: block; font-size: 0.7rem; color: #64748b; }
 .dg-val { font-weight: 600; font-size: 0.95rem; color: #f8fafc; font-family: 'Courier New', monospace; }
 .dg-fuente { display: block; font-size: 0.65rem; color: #64748b; margin-top: 2px; }
+.dg-val-usd { display: block; font-size: 0.8rem; color: #94a3b8; font-family: 'Courier New', monospace; margin-top: 2px; }
+.dg-val-usd.text-green { color: #4ade80 !important; }
 
 .mini-flujo {
   font-size: 0.8rem;

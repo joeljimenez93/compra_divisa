@@ -100,6 +100,7 @@
           <div>
             <div class="resultado-label">Ganancia Neta</div>
             <div class="resultado-valor">Bs {{ tasas.ejemplo_100usd.ganancia_bs.toLocaleString() }}</div>
+            <div class="resultado-usd">≈ ${{ tasas.ejemplo_100usd.ganancia_usd.toFixed(2) }} USD</div>
           </div>
           <div class="resultado-porcentaje">
             {{ tasas.ejemplo_100usd.ganancia_porcentaje >= 0 ? '+' : '' }}{{ tasas.ejemplo_100usd.ganancia_porcentaje }}%

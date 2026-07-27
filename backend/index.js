@@ -336,6 +336,7 @@ app.get('/api/tasas', async (req, res) => {
         usd_disponible: +usdDisponible.toFixed(2),
         venta_binance_bs: +ventaBinance.toFixed(2),
         ganancia_bs: +ganancia.toFixed(2),
+        ganancia_usd: +(ganancia / tasaBCV.tasa).toFixed(2),
         ganancia_porcentaje: +gananciaPorcentaje.toFixed(2),
         spread: +spread.toFixed(2)
       }
@@ -414,6 +415,7 @@ app.post('/api/operaciones', async (req, res) => {
         usd_disponible: +usdDisponible.toFixed(2),
         venta_binance_bs: +ventaBinanceBs.toFixed(2),
         ganancia_bs: +gananciaBs.toFixed(2),
+        ganancia_usd: +(gananciaBs / tasaBcvUsar).toFixed(2),
         ganancia_porcentaje: +gananciaPorcentaje.toFixed(2),
         spread: +spread.toFixed(4)
       },
@@ -446,6 +448,7 @@ app.get('/api/operaciones', (req, res) => {
   const totalInvertido = operaciones.reduce((s, o) => s + (o.detalle.costo_bs || o.detalle.costo_total_bs || 0), 0);
   const totalVendido = operaciones.reduce((s, o) => s + o.detalle.venta_binance_bs, 0);
   const totalGanancia = operaciones.reduce((s, o) => s + o.detalle.ganancia_bs, 0);
+  const totalGananciaUSD = operaciones.reduce((s, o) => s + (o.detalle.ganancia_usd || 0), 0);
   const gananciaPromedio = totalInvertido > 0 ? (totalGanancia / totalInvertido) * 100 : 0;
 
   res.json({
@@ -456,6 +459,7 @@ app.get('/api/operaciones', (req, res) => {
       total_bs_invertidos: +totalInvertido.toFixed(2),
       total_bs_vendidos: +totalVendido.toFixed(2),
       total_ganancia_bs: +totalGanancia.toFixed(2),
+      total_ganancia_usd: +totalGananciaUSD.toFixed(2),
       ganancia_promedio_porcentaje: +gananciaPromedio.toFixed(2)
     },
     operaciones
@@ -537,6 +541,7 @@ app.put('/api/operaciones/:id', (req, res) => {
     usd_disponible: +usdDisponible.toFixed(2),
     venta_binance_bs: +ventaBinanceBs.toFixed(2),
     ganancia_bs: +gananciaBs.toFixed(2),
+    ganancia_usd: +(gananciaBs / op.tasa_bcv).toFixed(2),
     ganancia_porcentaje: +gananciaPct.toFixed(2),
     spread: +(op.tasa_binance - op.tasa_bcv).toFixed(4)
   };

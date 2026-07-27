@@ -228,6 +228,11 @@
   color: #f8fafc;
   font-family: 'Courier New', monospace;
 }
+.resultado-usd {
+  font-size: 0.9rem;
+  color: #4ade80;
+  font-family: 'Courier New', monospace;
+}
 
 .resultado-porcentaje {
   margin-left: auto;

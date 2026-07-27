@@ -1,0 +1,47 @@
+<!-- Login screen when not authenticated -->
+<app-login *ngIf="!isLoggedIn"></app-login>
+
+<!-- Main app when authenticated -->
+<div class="app-container" *ngIf="isLoggedIn">
+  <header class="app-header">
+    <div class="logo">
+      <span class="logo-icon">💵</span>
+      <h1>Compra/Venta USD</h1>
+    </div>
+    <p class="subtitle">BCV → Zinli → Binance | Calcula tu ganancia</p>
+    <div class="user-bar" *ngIf="usuario">
+      <span class="user-name">👤 {{ usuario.nombre }}</span>
+      <button class="btn-logout" (click)="logout()">🚪 Salir</button>
+    </div>
+  </header>
+
+  <nav class="tabs">
+    <button [class.active]="activeTab === 'dashboard'" (click)="setTab('dashboard')">
+      📊 Dashboard
+    </button>
+    <button [class.active]="activeTab === 'nueva'" (click)="setTab('nueva')">
+      💰 Nueva Operación
+    </button>
+    <button [class.active]="activeTab === 'historial'" (click)="setTab('historial')">
+      📋 Historial
+    </button>
+    <button [class.active]="activeTab === 'config'" (click)="setTab('config')">
+      ⚙️ Configuración
+    </button>
+    <button *ngIf="isAdmin" [class.active]="activeTab === 'admin'" (click)="setTab('admin')">
+      🔑 Admin
+    </button>
+  </nav>
+
+  <main class="main-content">
+    <app-dashboard *ngIf="activeTab === 'dashboard'"></app-dashboard>
+    <app-nueva-operacion *ngIf="activeTab === 'nueva'"></app-nueva-operacion>
+    <app-historial *ngIf="activeTab === 'historial'"></app-historial>
+    <app-configuracion *ngIf="activeTab === 'config'"></app-configuracion>
+    <app-admin-panel *ngIf="activeTab === 'admin'"></app-admin-panel>
+  </main>
+
+  <footer class="app-footer">
+    <p>💡 <strong>Flujo:</strong> Bs → USD (tasa BCV) → Zinli (comisión) → Binance P2P (venta) → Ganancia</p>
+  </footer>
+</div>

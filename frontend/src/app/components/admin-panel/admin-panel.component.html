@@ -1,0 +1,39 @@
+<div class="admin-panel fade-in">
+  <h2>🔑 Panel de Administración</h2>
+  <p class="admin-desc">Gestiona los permisos de los usuarios registrados</p>
+
+  <div *ngIf="loading" class="loading">⏳ Cargando usuarios...</div>
+  <div *ngIf="mensaje" class="msg-ok">{{ mensaje }}</div>
+  <div *ngIf="error" class="msg-error">⚠️ {{ error }}</div>
+
+  <div class="users-table" *ngIf="!loading && usuarios.length > 0">
+    <div class="table-header">
+      <span class="col-nombre">Nombre</span>
+      <span class="col-email">Email</span>
+      <span class="col-rol">Rol</span>
+      <span class="col-accion">Acción</span>
+    </div>
+    <div class="table-row" *ngFor="let u of usuarios">
+      <span class="col-nombre">{{ u.nombre }}</span>
+      <span class="col-email">{{ u.email }}</span>
+      <span class="col-rol">
+        <span class="rol-badge" [class.admin]="u.rol === 'admin'" [class.user]="u.rol !== 'admin'">
+          {{ getRolBadge(u.rol) }}
+        </span>
+      </span>
+      <span class="col-accion">
+        <button
+          class="btn-toggle"
+          [class.btn-demote]="u.rol === 'admin'"
+          [class.btn-promote]="u.rol !== 'admin'"
+          (click)="guardarRol(u)">
+          {{ u.rol === 'admin' ? '⬇ Quitar admin' : '⬆ Hacer admin' }}
+        </button>
+      </span>
+    </div>
+  </div>
+
+  <div *ngIf="!loading && usuarios.length === 0" class="empty">
+    <p>📭 No hay usuarios registrados</p>
+  </div>
+</div>

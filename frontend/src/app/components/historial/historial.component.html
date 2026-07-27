@@ -1,0 +1,200 @@
+<div class="historial fade-in">
+  <div class="header-row">
+    <h2>📋 Historial de Operaciones</h2>
+    <button class="btn-refresh" (click)="cargar()">🔄 Actualizar</button>
+  </div>
+
+  <div *ngIf="loading" class="loading">⏳ Cargando historial...</div>
+  <div *ngIf="error" class="error-msg">⚠️ {{ error }}</div>
+
+  <!-- Resumen -->
+  <div class="resumen-bar" *ngIf="data && data.total_operaciones > 0">
+    <div class="rb-item">
+      <span class="rb-num">{{ data.total_operaciones }}</span>
+      <span class="rb-label">Operaciones</span>
+    </div>
+    <div class="rb-item">
+      <span class="rb-num">${{ data.resumen.total_usd_comprados.toLocaleString() }}</span>
+      <span class="rb-label">USD comprados</span>
+    </div>
+    <div class="rb-item">
+      <span class="rb-num">Bs {{ data.resumen.total_bs_invertidos.toLocaleString() }}</span>
+      <span class="rb-label">Invertido</span>
+    </div>
+    <div class="rb-item highlight">
+      <span class="rb-num" [class.text-green]="data.resumen.total_ganancia_bs >= 0" [class.text-red]="data.resumen.total_ganancia_bs < 0">
+        Bs {{ data.resumen.total_ganancia_bs.toLocaleString() }}
+      </span>
+      <span class="rb-label">Ganancia total</span>
+    </div>
+    <div class="rb-item">
+      <span class="rb-num" [class.text-green]="data.resumen.ganancia_promedio_porcentaje >= 0">
+        {{ data.resumen.ganancia_promedio_porcentaje >= 0 ? '+' : '' }}{{ data.resumen.ganancia_promedio_porcentaje }}%
+      </span>
+      <span class="rb-label">Promedio</span>
+    </div>
+  </div>
+
+  <!-- Sin operaciones -->
+  <div *ngIf="data && data.total_operaciones === 0" class="empty">
+    <p>📭 No hay operaciones registradas</p>
+    <p class="empty-hint">Ve a "Nueva Operación" para crear una.</p>
+  </div>
+
+  <!-- Lista de operaciones -->
+  <div class="ops-list" *ngIf="data && data.total_operaciones > 0">
+    <div
+      class="op-card"
+      *ngFor="let op of data.operaciones"
+      [class.expanded]="operacionExpandida === op.id"
+      (click)="toggleExpand(op.id)">
+
+      <div class="op-header">
+        <div class="op-info">
+          <span class="op-id">#{{ op.id }}</span>
+          <span class="op-fecha">📅 {{ formatearFecha(op.fecha) }}</span>
+            <span class="op-fuente" *ngIf="op.fuente_bcv?.includes('Manual')">✏️ Tasas manuales</span>
+        </div>
+        <div class="op-monto">
+          <span class="op-usd">${{ op.monto_usd.toLocaleString() }} USD</span>
+          <span class="op-ganancia" [class.positivo]="op.detalle.ganancia_bs >= 0" [class.negativo]="op.detalle.ganancia_bs < 0">
+            {{ op.detalle.ganancia_bs >= 0 ? '+' : '' }}Bs {{ op.detalle.ganancia_bs.toLocaleString() }}
+            ({{ op.detalle.ganancia_porcentaje >= 0 ? '+' : '' }}{{ op.detalle.ganancia_porcentaje }}%)
+          </span>
+        </div>
+        <div class="op-actions">
+          <button class="btn-edit" (click)="abrirEdicion(op, $event)" title="Editar comisión Zinli">✏️</button>
+          <button class="btn-delete" (click)="eliminar(op.id, $event)" title="Eliminar">🗑️</button>
+          <span class="expand-icon">{{ operacionExpandida === op.id ? '▲' : '▼' }}</span>
+        </div>
+      </div>
+
+      <!-- Detalle expandido -->
+      <div class="op-detail" *ngIf="operacionExpandida === op.id" (click)="$event.stopPropagation()">
+        <div class="detail-grid">
+          <div class="dg-item">
+            <span class="dg-label">Tasa BCV</span>
+            <span class="dg-val">Bs {{ op.tasa_bcv }}</span>
+            <span class="dg-fuente">{{ op.fuente_bcv }}</span>
+          </div>
+          <div class="dg-item">
+            <span class="dg-label">Tasa BCV efectiva</span>
+            <span class="dg-val text-yellow">Bs {{ op.tasa_bcv_efectiva || op.tasa_bcv }}</span>
+            <span class="dg-fuente" *ngIf="op.comision_divisas_porcentaje">+{{ op.comision_divisas_porcentaje }}% divisas</span>
+          </div>
+          <div class="dg-item">
+            <span class="dg-label">Tasa Binance</span>
+            <span class="dg-val">Bs {{ op.tasa_binance }}</span>
+            <span class="dg-fuente">{{ op.fuente_binance }}</span>
+          </div>
+          <div class="dg-item">
+            <span class="dg-label">Spread</span>
+            <span class="dg-val text-green">Bs {{ op.detalle.spread }}</span>
+          </div>
+          <div class="dg-item">
+            <span class="dg-label">Costo base Bs</span>
+            <span class="dg-val">Bs {{ (op.detalle.costo_base_bs || op.detalle.costo_bs).toLocaleString() }}</span>
+          </div>
+          <div class="dg-item">
+            <span class="dg-label">Comisión divisas</span>
+            <span class="dg-val text-red">+Bs {{ (op.detalle.comision_divisas_bs || 0).toLocaleString() }}</span>
+          </div>
+          <div class="dg-item">
+            <span class="dg-label">Costo total Bs</span>
+            <span class="dg-val text-yellow">Bs {{ op.detalle.costo_bs.toLocaleString() }}</span>
+          </div>
+          <div class="dg-item">
+            <span class="dg-label">Comisión Zinli</span>
+            <span class="dg-val text-red">-${{ (op.detalle.comision_zinli_usd || 0).toFixed(2) }} USD</span>
+          </div>
+          <div class="dg-item">
+            <span class="dg-label">USD a Binance</span>
+            <span class="dg-val">${{ (op.detalle.usd_disponible || op.monto_usd).toLocaleString() }}</span>
+          </div>
+          <div class="dg-item">
+            <span class="dg-label">Venta Binance</span>
+            <span class="dg-val text-green">Bs {{ op.detalle.venta_binance_bs.toLocaleString() }}</span>
+          </div>
+          <div class="dg-item highlight">
+            <span class="dg-label">Ganancia Neta</span>
+            <span class="dg-val" [class.text-green]="op.detalle.ganancia_bs >= 0" [class.text-red]="op.detalle.ganancia_bs < 0">
+              Bs {{ op.detalle.ganancia_bs.toLocaleString() }}
+            </span>
+          </div>
+        </div>
+
+        <!-- Edición comisión Zinli -->
+        <div class="edit-zinli" *ngIf="editandoId === op.id">
+          <h4>✏️ Ajustar valores reales</h4>
+          <p class="edit-hint">Estos valores se conocen después de ejecutada la operación.</p>
+          <div class="edit-row">
+            <div class="edit-field">
+              <label>Comisión Zinli (%)</label>
+              <input type="number" [(ngModel)]="editComisionZinliPct" step="0.1" min="0" max="20" class="input-small" />
+            </div>
+            <div class="edit-field">
+              <label>Comisión Zinli (USD)</label>
+              <input type="number" [(ngModel)]="editComisionZinliBs" step="0.01" min="0" class="input-small" placeholder="Monto en USD" />
+            </div>
+          </div>
+          <div class="edit-row">
+            <div class="edit-field">
+              <label>Tasa Binance P2P (Bs/USD)</label>
+              <input type="number" [(ngModel)]="editTasaBinance" step="0.01" min="0" class="input-small" placeholder="Tasa de venta" />
+            </div>
+            <div class="edit-field">
+              <label>Venta en Binance (Bs)</label>
+              <input type="number" [(ngModel)]="editVentaBinanceBs" step="0.01" min="0" class="input-small" placeholder="Monto real vendido" />
+            </div>
+          </div>
+          <!-- Foto venta -->
+          <div class="edit-field" style="margin-top: 12px;">
+            <label>📸 Comprobante de venta en Binance</label>
+            <div class="foto-upload">
+              <input type="file" accept="image/*" (change)="onFileSelectedHistorial($event, 'venta')" [id]="'foto-venta-' + op.id" hidden />
+              <label [for]="'foto-venta-' + op.id" class="foto-label" *ngIf="!editFotoVenta">
+                📷 Seleccionar imagen
+              </label>
+              <div class="foto-preview" *ngIf="editFotoVenta">
+                <img [src]="editFotoVenta" alt="Comprobante venta" />
+                <span class="foto-nombre">{{ editFotoVentaNombre }}</span>
+                <button class="foto-quitar" (click)="quitarFotoHistorial()">✕</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="edit-actions">
+            <button class="btn-save" (click)="guardarEdicion()" [disabled]="guardandoEdit">
+              {{ guardandoEdit ? '⏳...' : '💾 Guardar' }}
+            </button>
+            <button class="btn-cancel" (click)="cancelarEdicion()">Cancelar</button>
+          </div>
+          <div class="edit-msg" *ngIf="mensajeEdit">{{ mensajeEdit }}</div>
+        </div>
+
+        <!-- Fotos adjuntas -->
+        <div class="fotos-detalle" *ngIf="op.foto_compra || op.foto_venta">
+          <div class="foto-thumb" *ngIf="op.foto_compra">
+            <span class="foto-thumb-label">📄 Comprobante compra</span>
+            <a [href]="op.foto_compra" target="_blank">
+              <img [src]="op.foto_compra" alt="Comprobante compra" />
+            </a>
+          </div>
+          <div class="foto-thumb" *ngIf="op.foto_venta">
+            <span class="foto-thumb-label">🟡 Comprobante venta Binance</span>
+            <a [href]="op.foto_venta" target="_blank">
+              <img [src]="op.foto_venta" alt="Comprobante venta" />
+            </a>
+          </div>
+        </div>
+
+        <!-- Mini flujo -->
+        <div class="mini-flujo">
+          <span *ngFor="let p of op.flujo; let last = last">
+            <strong>{{ p.descripcion }}</strong><span *ngIf="!last"> → </span>
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

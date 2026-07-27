@@ -1,0 +1,120 @@
+<div class="dashboard">
+  <!-- Loading -->
+  <div *ngIf="loading" class="loading">⏳ Cargando tasas...</div>
+
+  <!-- Error -->
+  <div *ngIf="error" class="error-box">
+    <p>⚠️ {{ error }}</p>
+    <button class="btn-retry" (click)="cargarTasas()">Reintentar</button>
+  </div>
+
+  <!-- Tasas -->
+  <div *ngIf="tasas && !loading" class="fade-in">
+    <!-- Cards de tasas -->
+    <div class="rate-cards">
+      <div class="rate-card bcv">
+        <div class="rate-label">🏦 Tasa BCV (Compra)</div>
+        <div class="rate-value">Bs {{ tasas.tasas.bcv.tasa.toFixed(2) }}</div>
+        <div class="rate-source">{{ tasas.tasas.bcv.fuente }}</div>
+      </div>
+
+      <div class="rate-card arrow-card">
+        <div class="arrow">→</div>
+        <div class="spread-tag">Spread: +Bs {{ (tasas.tasas.binance_p2p.tasa - tasas.tasas.bcv.tasa).toFixed(2) }}</div>
+      </div>
+
+      <div class="rate-card binance">
+        <div class="rate-label">🟡 Binance P2P (Venta)</div>
+        <div class="rate-value">Bs {{ tasas.tasas.binance_p2p.tasa.toFixed(2) }}</div>
+        <div class="rate-source">{{ tasas.tasas.binance_p2p.fuente }}</div>
+      </div>
+    </div>
+
+    <!-- Comisiones -->
+    <div class="comisiones-row">
+      <div class="comision-card divisas">
+        <span>💱 <strong>Comisión divisas:</strong> {{ tasas.comisiones.divisas.porcentaje }}%</span>
+        <span class="comision-detail">BCV efectiva: Bs {{ tasas.tasas.bcv_efectiva.tasa.toFixed(2) }}</span>
+      </div>
+      <div class="comision-card zinli">
+        <span>🏧 <strong>Comisión Zinli:</strong> {{ tasas.comisiones.zinli.porcentaje }}%</span>
+      </div>
+    </div>
+
+    <!-- Simulación -->
+    <div class="simulacion">
+      <h2>📐 Simulación para ${{ tasas.ejemplo_100usd.monto_usd }} USD</h2>
+
+      <div class="flujo-visual">
+        <!-- Paso 1 -->
+        <div class="paso">
+          <div class="paso-num">1</div>
+          <div class="paso-content">
+            <strong>Compras USD a tasa BCV</strong>
+            <p>${{ tasas.ejemplo_100usd.monto_usd }} × Bs {{ tasas.ejemplo_100usd.tasa_bcv }} = <span class="mono">Bs {{ tasas.ejemplo_100usd.costo_base_bs.toLocaleString() }}</span></p>
+          </div>
+        </div>
+
+        <!-- Paso 2 -->
+        <div class="paso">
+          <div class="paso-num">2</div>
+          <div class="paso-content">
+            <strong>Comisión adquisición divisas ({{ tasas.comisiones.divisas.porcentaje }}%)</strong>
+            <p>+<span class="mono text-red">Bs {{ tasas.ejemplo_100usd.costo_divisas_bs.toLocaleString() }}</span> → Tasa efectiva: <span class="mono text-yellow">Bs {{ tasas.ejemplo_100usd.tasa_bcv_efectiva }}</span></p>
+          </div>
+        </div>
+
+        <!-- Paso 3 -->
+        <div class="paso">
+          <div class="paso-num">3</div>
+          <div class="paso-content">
+            <strong>Transfieres a Zinli</strong>
+            <p>Zinli cobra <span class="mono text-red">{{ tasas.comisiones.zinli.porcentaje }}% en USD</span>: -${{ tasas.ejemplo_100usd.comision_zinli_usd }} USD</p>
+            <p>Quedan: <span class="mono text-yellow">${{ tasas.ejemplo_100usd.usd_disponible }} USD</span></p>
+          </div>
+        </div>
+
+        <!-- Paso 4 -->
+        <div class="paso">
+          <div class="paso-num">4</div>
+          <div class="paso-content">
+            <strong>Llega a Binance</strong>
+            <p><span class="mono">${{ tasas.ejemplo_100usd.usd_disponible }} USD</span> disponibles para vender</p>
+          </div>
+        </div>
+
+        <!-- Paso 5 -->
+        <div class="paso">
+          <div class="paso-num">5</div>
+          <div class="paso-content">
+            <strong>Vendes en Binance P2P</strong>
+            <p>${{ tasas.ejemplo_100usd.usd_disponible }} × Bs {{ tasas.tasas.binance_p2p.tasa.toFixed(2) }} = <span class="mono text-green">Bs {{ tasas.ejemplo_100usd.venta_binance_bs.toLocaleString() }}</span></p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Resultado -->
+      <div class="resultado-card" [ngClass]="gananciaClass">
+        <div class="resultado-main">
+          <span class="resultado-emoji">{{ tasas.ejemplo_100usd.ganancia_bs >= 0 ? '🎉' : '😟' }}</span>
+          <div>
+            <div class="resultado-label">Ganancia Neta</div>
+            <div class="resultado-valor">Bs {{ tasas.ejemplo_100usd.ganancia_bs.toLocaleString() }}</div>
+          </div>
+          <div class="resultado-porcentaje">
+            {{ tasas.ejemplo_100usd.ganancia_porcentaje >= 0 ? '+' : '' }}{{ tasas.ejemplo_100usd.ganancia_porcentaje }}%
+          </div>
+        </div>
+        <div class="resultado-detalle">
+          <span>Invertido: Bs {{ tasas.ejemplo_100usd.costo_total_bs.toLocaleString() }}</span>
+          <span>→</span>
+          <span>Vendido (${{ tasas.ejemplo_100usd.usd_disponible }} USD): Bs {{ tasas.ejemplo_100usd.venta_binance_bs.toLocaleString() }}</span>
+          <span>=</span>
+          <span [class.text-green]="tasas.ejemplo_100usd.ganancia_bs >= 0" [class.text-red]="tasas.ejemplo_100usd.ganancia_bs < 0">
+            Bs {{ tasas.ejemplo_100usd.ganancia_bs >= 0 ? '+' : '' }}{{ tasas.ejemplo_100usd.ganancia_bs.toLocaleString() }}
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

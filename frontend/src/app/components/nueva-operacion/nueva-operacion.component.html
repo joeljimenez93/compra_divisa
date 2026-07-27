@@ -1,0 +1,216 @@
+<div class="nueva-op fade-in">
+  <h2>💰 Nueva Operación de Compra</h2>
+
+  <!-- Formulario (si no hay resultado) -->
+  <div *ngIf="!resultado">
+    <!-- Fecha -->
+    <div class="form-group">
+      <label>📅 Fecha de la operación</label>
+      <input
+        type="date"
+        [(ngModel)]="fechaOperacion"
+        class="input"
+      />
+      <span class="hint">Puedes registrar operaciones de días anteriores</span>
+    </div>
+
+    <!-- Monto USD -->
+    <div class="form-group">
+      <label>💵 Monto en USD a comprar</label>
+      <div class="monto-input">
+        <span class="prefix">$</span>
+        <input
+          type="number"
+          [(ngModel)]="montoUSD"
+          min="1"
+          step="1"
+          placeholder="100"
+          class="input-monto"
+        />
+      </div>
+      <div class="sugerencias">
+        <button
+          *ngFor="let m of montosSugeridos"
+          (click)="setMonto(m)"
+          [class.selected]="montoUSD === m"
+          class="btn-sugerencia">
+          ${{ m }}
+        </button>
+      </div>
+    </div>
+
+    <!-- Selector de tasas -->
+    <div class="form-group">
+      <label>💱 Tipo de tasas</label>
+      <div class="toggle-row">
+        <button
+          class="toggle-btn"
+          [class.active]="usarTasasAuto"
+          (click)="setTasasAutomaticas()">
+          🔄 Automáticas (hoy)
+        </button>
+        <button
+          class="toggle-btn"
+          [class.active]="!usarTasasAuto"
+          (click)="setTasasManuales()">
+          ✏️ Ingresar manualmente
+        </button>
+      </div>
+    </div>
+
+    <!-- Tasas actuales (referencia) -->
+    <div class="tasas-ref" *ngIf="tasasActuales">
+      <span class="ref-label">📊 Referencia:</span>
+      <span class="ref-val">BCV Bs {{ tasasActuales.tasas.bcv.tasa.toFixed(2) }}</span>
+      <span class="ref-val div">→ Efectiva Bs {{ tasasActuales.tasas.bcv_efectiva.tasa.toFixed(2) }}</span>
+      <span class="ref-val">Binance Bs {{ tasasActuales.tasas.binance_p2p.tasa.toFixed(2) }}</span>
+    </div>
+
+    <!-- Tasas manuales -->
+    <div class="tasas-grid">
+      <div class="form-group">
+        <label>
+          🏦 Tasa BCV (Bs/USD)
+          <span class="label-badge" [class.auto]="usarTasasAuto" [class.manual]="!usarTasasAuto">
+            {{ usarTasasAuto ? 'Auto' : 'Manual' }}
+          </span>
+        </label>
+        <input
+          type="number"
+          [(ngModel)]="tasaBcv"
+          step="0.01"
+          min="0.01"
+          [placeholder]="usarTasasAuto && tasasActuales ? 'Bs ' + tasasActuales.tasas.bcv.tasa.toFixed(2) : 'Ej: 55.32'"
+          class="input tasa-input"
+          [readonly]="usarTasasAuto"
+        />
+        <span class="input-hint" *ngIf="usarTasasAuto && tasasActuales">
+          Fuente: {{ tasasActuales.tasas.bcv.fuente }}
+        </span>
+      </div>
+
+      <div class="form-group">
+        <label>
+          🟡 Tasa Binance P2P (Bs/USD)
+          <span class="label-badge" [class.auto]="usarTasasAuto" [class.manual]="!usarTasasAuto">
+            {{ usarTasasAuto ? 'Auto' : 'Manual' }}
+          </span>
+        </label>
+        <input
+          type="number"
+          [(ngModel)]="tasaBinance"
+          step="0.01"
+          min="0.01"
+          [placeholder]="usarTasasAuto && tasasActuales ? 'Bs ' + tasasActuales.tasas.binance_p2p.tasa.toFixed(2) : 'Ej: 65.80'"
+          class="input tasa-input binance-input"
+          [readonly]="usarTasasAuto"
+        />
+        <span class="input-hint" *ngIf="usarTasasAuto && tasasActuales">
+          Fuente: {{ tasasActuales.tasas.binance_p2p.fuente }}
+        </span>
+      </div>
+    </div>
+
+    <!-- Foto comprobante de compra -->
+    <div class="form-group">
+      <label>📸 Comprobante de compra de divisas</label>
+      <div class="foto-upload">
+        <input type="file" accept="image/*" (change)="onFileSelected($event, 'compra')" id="foto-compra" hidden />
+        <label for="foto-compra" class="foto-label" *ngIf="!fotoCompra">
+          📷 Seleccionar imagen
+        </label>
+        <div class="foto-preview" *ngIf="fotoCompra">
+          <img [src]="fotoCompra" alt="Comprobante" />
+          <span class="foto-nombre">{{ fotoCompraNombre }}</span>
+          <button class="foto-quitar" (click)="quitarFoto('compra')">✕</button>
+        </div>
+      </div>
+      <span class="hint">Adjunta el comprobante de la compra de divisas en el banco</span>
+    </div>
+
+    <!-- Error -->
+    <div *ngIf="error" class="error-msg">⚠️ {{ error }}</div>
+
+    <!-- Botón calcular -->
+    <button class="btn-calcular" (click)="calcular()" [disabled]="loading">
+      {{ loading ? '⏳ Calculando...' : '📊 Calcular Ganancia' }}
+    </button>
+  </div>
+
+  <!-- Resultado -->
+  <div *ngIf="resultado" class="resultado fade-in">
+    <h3>✅ Operación Registrada (#{{ resultado.id }})</h3>
+
+    <div class="fecha-badge">
+      📅 {{ resultado.fecha | date:'dd/MM/yyyy' }}
+    </div>
+
+    <!-- Resumen financiero -->
+    <div class="resumen-grid">
+      <div class="resumen-item">
+        <span class="resumen-label">Monto USD</span>
+        <span class="resumen-valor">${{ resultado.monto_usd.toLocaleString() }}</span>
+      </div>
+      <div class="resumen-item">
+        <span class="resumen-label">Tasa BCV</span>
+        <span class="resumen-valor">Bs {{ resultado.tasa_bcv }}</span>
+      </div>
+      <div class="resumen-item">
+        <span class="resumen-label">Costo en Bs</span>
+        <span class="resumen-valor">Bs {{ resultado.detalle.costo_bs.toLocaleString() }}</span>
+      </div>
+      <div class="resumen-item">
+        <span class="resumen-label">Comisión Zinli</span>
+        <span class="resumen-valor text-red">-${{ (resultado.detalle.comision_zinli_usd || 0).toFixed(2) }} USD</span>
+      </div>
+    </div>
+
+    <!-- Flujo -->
+    <div class="flujo">
+      <h4>📋 Flujo de la operación</h4>
+      <div class="flujo-pasos">
+        <div *ngFor="let paso of resultado.flujo" class="flujo-paso">
+          <div class="flujo-paso-num">{{ paso.paso }}</div>
+          <div class="flujo-paso-text">
+            <strong>{{ paso.descripcion }}</strong>
+            <ng-container [ngSwitch]="paso.paso">
+              <p *ngSwitchCase="1">${{ paso.monto_usd }} × Bs {{ paso.tasa }} = Bs {{ paso.costo_bs.toLocaleString() }}</p>
+              <p *ngSwitchCase="2">{{ paso.porcentaje }}% = +Bs {{ paso.costo_bs.toLocaleString() }}</p>
+              <p *ngSwitchCase="3">
+                <ng-container *ngIf="paso.usd_restantes">Recibes ${{ paso.usd_recibidos }}, comisión ${{ paso.comision_usd }} USD → restan <strong>${{ paso.usd_restantes }} USD</strong></ng-container>
+                <ng-container *ngIf="!paso.usd_restantes">Comisión {{ paso.comision_porcentaje }}%</ng-container>
+              </p>
+              <p *ngSwitchCase="4">
+                <ng-container *ngIf="paso.usd_disponible"><strong>${{ paso.usd_disponible }} USD</strong> disponibles en Binance</ng-container>
+                <ng-container *ngIf="!paso.usd_disponible">${{ paso.monto_usd || '?' }} USD transferidos</ng-container>
+              </p>
+              <p *ngSwitchCase="5">
+                <ng-container *ngIf="paso.usd">${{ paso.usd }} × Bs {{ paso.tasa }} = Bs {{ paso.ingreso_bs.toLocaleString() }}</ng-container>
+                <ng-container *ngIf="!paso.usd">Tasa Bs {{ paso.tasa }} → Bs {{ paso.ingreso_bs.toLocaleString() }}</ng-container>
+              </p>
+              <p *ngSwitchCase="6" class="ganancia-text">Bs {{ paso.ganancia_bs.toLocaleString() }} ({{ paso.ganancia_porcentaje }}%)</p>
+            </ng-container>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Total -->
+    <div class="resultado-final" [class.positivo]="resultado.detalle.ganancia_bs >= 0" [class.negativo]="resultado.detalle.ganancia_bs < 0">
+      <div class="rf-main">
+        <span class="rf-emoji">{{ resultado.detalle.ganancia_bs >= 0 ? '🎉' : '😟' }}</span>
+        <div>
+          <div class="rf-label">Ganancia Neta</div>
+          <div class="rf-valor">Bs {{ resultado.detalle.ganancia_bs.toLocaleString() }}</div>
+        </div>
+        <div class="rf-porcentaje">
+          {{ resultado.detalle.ganancia_porcentaje >= 0 ? '+' : '' }}{{ resultado.detalle.ganancia_porcentaje }}%
+        </div>
+      </div>
+    </div>
+
+    <div class="acciones">
+      <button class="btn-nueva" (click)="nuevaOperacion()">🔄 Nueva Operación</button>
+    </div>
+  </div>
+</div>

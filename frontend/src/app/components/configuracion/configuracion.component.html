@@ -1,0 +1,126 @@
+<div class="config fade-in">
+  <h2>⚙️ Configuración</h2>
+
+  <div *ngIf="loading" class="loading">⏳ Cargando...</div>
+  <div *ngIf="mensaje" class="msg-ok">{{ mensaje }}</div>
+  <div *ngIf="error" class="msg-error">⚠️ {{ error }}</div>
+
+  <div *ngIf="!loading && config" class="config-form">
+    <!-- Comisión Divisas -->
+    <div class="config-section">
+      <h3>💱 Comisión Adquisición Divisas</h3>
+      <p class="desc">Porcentaje que cobra la entidad por la compra de divisas (se suma a la tasa BCV).</p>
+      <div class="input-group">
+        <input
+          type="range"
+          [(ngModel)]="comisionDivisas"
+          min="0"
+          max="5"
+          step="0.01"
+          class="slider"
+        />
+        <div class="range-val">
+          <span class="range-num">{{ comisionDivisas.toFixed(2) }}%</span>
+        </div>
+      </div>
+      <div class="ejemplo-comision">
+        <p>Ejemplo: BCV Bs 736.93 + {{ comisionDivisas }}% → <strong>Tasa efectiva Bs {{ (736.93 * (1 + comisionDivisas / 100)).toFixed(2) }}</strong></p>
+      </div>
+    </div>
+
+    <!-- Comisión Zinli -->
+    <div class="config-section">
+      <h3>🏧 Comisión Zinli</h3>
+      <p class="desc">Porcentaje que cobra Zinli por recibir/transferir los dólares.</p>
+      <div class="input-group">
+        <input
+          type="range"
+          [(ngModel)]="comisionZinli"
+          min="0"
+          max="10"
+          step="0.1"
+          class="slider"
+        />
+        <div class="range-val">
+          <span class="range-num">{{ comisionZinli.toFixed(1) }}%</span>
+        </div>
+      </div>
+      <div class="ejemplo-comision">
+        <p>Ejemplo sobre $100 (post-divisas): <strong>Bs {{ (100 * 740.61 * comisionZinli / 100).toFixed(2) }}</strong> de comisión</p>
+      </div>
+    </div>
+
+    <!-- Tasas Manuales -->
+    <div class="config-section">
+      <h3>💱 Tasas Manuales</h3>
+      <p class="desc">
+        Si el sistema no puede obtener las tasas automáticamente desde dolarapi.com,
+        se usarán estos valores como respaldo. Déjalos en blanco para usar solo las tasas automáticas.
+      </p>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>🏦 Tasa BCV (Bs/USD)</label>
+          <input
+            type="number"
+            [(ngModel)]="tasaBcvManual"
+            step="0.01"
+            placeholder="Automática"
+            class="input"
+          />
+        </div>
+        <div class="form-group">
+          <label>🟡 Tasa Binance P2P (Bs/USD)</label>
+          <input
+            type="number"
+            [(ngModel)]="tasaBinanceManual"
+            step="0.01"
+            placeholder="Automática"
+            class="input"
+          />
+        </div>
+      </div>
+      <button class="btn-link" (click)="limpiarTasasManuales()">Limpiar tasas manuales</button>
+    </div>
+
+    <!-- Info -->
+    <div class="config-section info">
+      <h3>ℹ️ Sobre las tasas</h3>
+      <ul>
+        <li><strong>Tasa BCV:</strong> Tasa oficial del Banco Central de Venezuela</li>
+        <li><strong>Tasa Binance P2P:</strong> Tasa del mercado paralelo/usado en Binance</li>
+        <li><strong>Spread:</strong> Diferencia entre compra (BCV) y venta (Binance)</li>
+        <li>Las tasas se obtienen desde <code>dolarapi.com</code> si está disponible</li>
+      </ul>
+    </div>
+
+    <!-- Cambiar Contraseña -->
+    <div class="config-section">
+      <h3>🔒 Cambiar Contraseña</h3>
+      <div class="form-group">
+        <label>Contraseña actual</label>
+        <input type="password" [(ngModel)]="passwordActual" placeholder="••••" class="input" />
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Nueva contraseña</label>
+          <input type="password" [(ngModel)]="passwordNueva" placeholder="Mín 4 caracteres" class="input" />
+        </div>
+        <div class="form-group">
+          <label>Confirmar nueva contraseña</label>
+          <input type="password" [(ngModel)]="passwordConfirmar" placeholder="Repite la contraseña" class="input" />
+        </div>
+      </div>
+      <div *ngIf="mensajePass" class="msg-ok">{{ mensajePass }}</div>
+      <div *ngIf="errorPass" class="msg-error">{{ errorPass }}</div>
+      <button class="btn-pass" (click)="cambiarPassword()" [disabled]="cambiandoPassword">
+        {{ cambiandoPassword ? '⏳ Cambiando...' : '🔒 Cambiar Contraseña' }}
+      </button>
+    </div>
+
+    <!-- Guardar -->
+    <button class="btn-guardar" (click)="guardar()" [disabled]="guardando">
+      {{ guardando ? '⏳ Guardando...' : '💾 Guardar Configuración' }}
+    </button>
+  </div>
+</div>

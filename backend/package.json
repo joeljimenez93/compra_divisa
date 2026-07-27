@@ -1,0 +1,18 @@
+{
+  "name": "compra-dolares-backend",
+  "version": "1.0.0",
+  "description": "Backend para compra/venta de dólares BCV → Zinli → Binance",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "node --watch index.js",
+    "build:frontend": "cd ../frontend && npm install && npx ng build --configuration=production"
+  },
+  "dependencies": {
+    "axios": "^1.7.0",
+    "bcryptjs": "^3.0.3",
+    "cors": "^2.8.5",
+    "express": "^4.21.0",
+    "jsonwebtoken": "^9.0.3"
+  }
+}

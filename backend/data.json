@@ -1,0 +1,299 @@
+{
+  "usuarios": [
+    {
+      "id": 1785118720099,
+      "nombre": "Joel",
+      "email": "joel@gmail.com",
+      "password": "$2b$10$h7IQo0NRTh1ApE2961wv5eeRUkXgFHI.dDTKnFVUwM2bbGp2nfq1y",
+      "creado": "2026-07-27T02:18:40.099Z"
+    },
+    {
+      "id": 1785118877090,
+      "nombre": "joel jimenez",
+      "email": "joeljim2293@gmail.com",
+      "password": "$2b$10$OAYY2AGqaoVQdRWVcK8HSOScAIO4a4NpJYTY0MxxL59YBhVkFNw9i",
+      "creado": "2026-07-27T02:21:17.090Z",
+      "rol": "admin"
+    }
+  ],
+  "operaciones": [
+    {
+      "id": 1785116108472,
+      "fecha": "2026-07-27T01:35:08.472Z",
+      "fecha_registro": "2026-07-27T01:35:08.472Z",
+      "monto_usd": 100,
+      "tasa_bcv": 736.93,
+      "tasa_bcv_efectiva": 740.6146,
+      "fuente_bcv": "Manual",
+      "tasa_binance": 858.2,
+      "fuente_binance": "Manual",
+      "comision_divisas_porcentaje": 0.5,
+      "comision_zinli_porcentaje": 0.34,
+      "detalle": {
+        "costo_base_bs": 73693,
+        "comision_divisas_bs": 368.47,
+        "costo_bs": 74061.46,
+        "comision_zinli_bs": 250,
+        "costo_total_bs": 74311.46,
+        "venta_binance_bs": 86000,
+        "ganancia_bs": 11688.54,
+        "ganancia_porcentaje": 15.73,
+        "spread": 121.27
+      },
+      "flujo": [
+        {
+          "paso": 1,
+          "descripcion": "Compra USD a tasa BCV",
+          "monto_usd": 100,
+          "tasa": 736.93,
+          "costo_bs": 73693,
+          "fuente": "Manual"
+        },
+        {
+          "paso": 2,
+          "descripcion": "Comisión adquisición divisas",
+          "porcentaje": 0.5,
+          "tasa_efectiva": 740.61,
+          "costo_bs": 368.47
+        },
+        {
+          "paso": 3,
+          "descripcion": "Transferencia a Zinli",
+          "comision_porcentaje": 0.34,
+          "comision_bs": 250
+        },
+        {
+          "paso": 4,
+          "descripcion": "Transferencia a Binance",
+          "monto_usd": 100
+        },
+        {
+          "paso": 5,
+          "descripcion": "Venta en Binance P2P",
+          "tasa": 860,
+          "ingreso_bs": 86000,
+          "fuente": "Manual (editado)"
+        },
+        {
+          "paso": 6,
+          "descripcion": "Ganancia neta",
+          "ganancia_bs": 11688.54,
+          "ganancia_porcentaje": 15.73
+        }
+      ],
+      "tasa_binance_efectiva": 860
+    },
+    {
+      "id": 1785116848067,
+      "fecha": "2026-07-27T01:47:28.066Z",
+      "fecha_registro": "2026-07-27T01:47:28.067Z",
+      "monto_usd": 100,
+      "tasa_bcv": 736.93,
+      "tasa_bcv_efectiva": 740.6146,
+      "fuente_bcv": "Manual",
+      "tasa_binance": 858.2,
+      "fuente_binance": "Manual",
+      "comision_divisas_porcentaje": 0.5,
+      "comision_zinli_porcentaje": 2.2,
+      "foto_compra": "data:image/png;base64,test123",
+      "foto_venta": null,
+      "detalle": {
+        "costo_base_bs": 73693,
+        "comision_divisas_bs": 368.47,
+        "costo_bs": 74061.46,
+        "comision_zinli_bs": 1629.35,
+        "costo_total_bs": 75690.82,
+        "venta_binance_bs": 85820,
+        "ganancia_bs": 10129.18,
+        "ganancia_porcentaje": 13.38,
+        "spread": 121.27
+      },
+      "flujo": [
+        {
+          "paso": 1,
+          "descripcion": "Compra USD a tasa BCV",
+          "monto_usd": 100,
+          "tasa": 736.93,
+          "costo_bs": 73693,
+          "fuente": "Manual"
+        },
+        {
+          "paso": 2,
+          "descripcion": "Comisión adquisición divisas",
+          "porcentaje": 0.5,
+          "tasa_efectiva": 740.61,
+          "costo_bs": 368.47
+        },
+        {
+          "paso": 3,
+          "descripcion": "Transferencia a Zinli",
+          "comision_porcentaje": 2.2,
+          "comision_bs": 1629.35
+        },
+        {
+          "paso": 4,
+          "descripcion": "Transferencia a Binance",
+          "monto_usd": 100
+        },
+        {
+          "paso": 5,
+          "descripcion": "Venta en Binance P2P",
+          "tasa": 858.2,
+          "ingreso_bs": 85820,
+          "fuente": "Manual"
+        },
+        {
+          "paso": 6,
+          "descripcion": "Ganancia neta",
+          "ganancia_bs": 10129.18,
+          "ganancia_porcentaje": 13.38
+        }
+      ]
+    },
+    {
+      "id": 1785118301684,
+      "fecha": "2026-07-27T00:00:00.000Z",
+      "fecha_registro": "2026-07-27T02:11:41.684Z",
+      "monto_usd": 200,
+      "tasa_bcv": 736.93,
+      "tasa_bcv_efectiva": 740.6146,
+      "fuente_bcv": "Manual",
+      "tasa_binance": 858.66,
+      "fuente_binance": "Manual",
+      "comision_divisas_porcentaje": 0.5,
+      "comision_zinli_porcentaje": 2.2,
+      "foto_compra": null,
+      "foto_venta": null,
+      "detalle": {
+        "costo_base_bs": 147386,
+        "comision_divisas_bs": 736.93,
+        "costo_bs": 148122.93,
+        "comision_zinli_bs": 3258.7,
+        "costo_total_bs": 151381.63,
+        "venta_binance_bs": 171732,
+        "ganancia_bs": 20350.37,
+        "ganancia_porcentaje": 13.44,
+        "spread": 121.73
+      },
+      "flujo": [
+        {
+          "paso": 1,
+          "descripcion": "Compra USD a tasa BCV",
+          "monto_usd": 200,
+          "tasa": 736.93,
+          "costo_bs": 147386,
+          "fuente": "Manual"
+        },
+        {
+          "paso": 2,
+          "descripcion": "Comisión adquisición divisas",
+          "porcentaje": 0.5,
+          "tasa_efectiva": 740.61,
+          "costo_bs": 736.93
+        },
+        {
+          "paso": 3,
+          "descripcion": "Transferencia a Zinli",
+          "comision_porcentaje": 2.2,
+          "comision_bs": 3258.7
+        },
+        {
+          "paso": 4,
+          "descripcion": "Transferencia a Binance",
+          "monto_usd": 200
+        },
+        {
+          "paso": 5,
+          "descripcion": "Venta en Binance P2P",
+          "tasa": 858.66,
+          "ingreso_bs": 171732,
+          "fuente": "Manual"
+        },
+        {
+          "paso": 6,
+          "descripcion": "Ganancia neta",
+          "ganancia_bs": 20350.37,
+          "ganancia_porcentaje": 13.44
+        }
+      ]
+    },
+    {
+      "id": 1785119215368,
+      "fecha": "2026-07-27T02:26:55.368Z",
+      "fecha_registro": "2026-07-27T02:26:55.368Z",
+      "monto_usd": 100,
+      "tasa_bcv": 736.93,
+      "tasa_bcv_efectiva": 740.6146,
+      "fuente_bcv": "Manual",
+      "tasa_binance": 858.2,
+      "fuente_binance": "Manual",
+      "comision_divisas_porcentaje": 0.5,
+      "comision_zinli_porcentaje": 2.2,
+      "foto_compra": null,
+      "foto_venta": null,
+      "detalle": {
+        "costo_base_bs": 73693,
+        "comision_divisas_bs": 368.47,
+        "costo_bs": 74061.46,
+        "comision_zinli_usd": 2.2,
+        "usd_disponible": 97.8,
+        "venta_binance_bs": 83931.96,
+        "ganancia_bs": 9870.5,
+        "ganancia_porcentaje": 13.33,
+        "spread": 121.27
+      },
+      "flujo": [
+        {
+          "paso": 1,
+          "descripcion": "Compra USD a tasa BCV",
+          "monto_usd": 100,
+          "tasa": 736.93,
+          "costo_bs": 73693,
+          "fuente": "Manual"
+        },
+        {
+          "paso": 2,
+          "descripcion": "Comisión adquisición divisas",
+          "porcentaje": 0.5,
+          "tasa_efectiva": 740.61,
+          "costo_bs": 368.47
+        },
+        {
+          "paso": 3,
+          "descripcion": "Transferencia a Zinli",
+          "comision_porcentaje": 2.2,
+          "usd_recibidos": 100,
+          "comision_usd": 2.2,
+          "usd_restantes": 97.8
+        },
+        {
+          "paso": 4,
+          "descripcion": "Transferencia a Binance",
+          "usd_disponible": 97.8
+        },
+        {
+          "paso": 5,
+          "descripcion": "Venta en Binance P2P",
+          "usd": 97.8,
+          "tasa": 858.2,
+          "ingreso_bs": 83931.96,
+          "fuente": "Manual"
+        },
+        {
+          "paso": 6,
+          "descripcion": "Ganancia neta",
+          "ganancia_bs": 9870.5,
+          "ganancia_porcentaje": 13.33
+        }
+      ]
+    }
+  ],
+  "config": {
+    "comision_zinli_porcentaje": 2.2,
+    "comision_divisas_porcentaje": 0.5,
+    "tasa_bcv_manual": null,
+    "tasa_binance_manual": null,
+    "margen_minimo_ganancia": 1.5,
+    "fecha_actualizacion": "2026-07-27T02:55:19.344Z"
+  }
+}

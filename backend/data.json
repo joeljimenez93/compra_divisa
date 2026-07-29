@@ -4,14 +4,14 @@
       "id": 1785118720099,
       "nombre": "Joel",
       "email": "joel@gmail.com",
-      "password": "$2b$10$h7IQo0NRTh1ApE2961wv5eeRUkXgFHI.dDTKnFVUwM2bbGp2nfq1y",
+      "password": "$2b$10$EH5cYye0uv9IAjzaRJSD7uF.CtCX7Vri6ECxiMALysiHptjZMeTYS",
       "creado": "2026-07-27T02:18:40.099Z"
     },
     {
       "id": 1785118877090,
       "nombre": "joel jimenez",
       "email": "joeljim2293@gmail.com",
-      "password": "$2b$10$OAYY2AGqaoVQdRWVcK8HSOScAIO4a4NpJYTY0MxxL59YBhVkFNw9i",
+      "password": "$2b$10$UDpKf3SHDwlu2Yw85fUdT.cTJWtk27I4103RCAV0Kgf0BpXZ6OwQy",
       "creado": "2026-07-27T02:21:17.090Z",
       "rol": "admin"
     }

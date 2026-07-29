@@ -44,8 +44,17 @@ export class LoginComponent {
         window.location.reload();
       },
       error: (err) => {
-        this.error = err.error?.error || 'Error al iniciar sesión';
         this.loading = false;
+        console.error('Login error:', err);
+        if (err.status === 0 || !err.status) {
+          this.error = '❌ Error de conexión. Verifica tu internet.';
+        } else if (err.status === 401) {
+          this.error = '❌ Credenciales inválidas';
+        } else if (err.status === 409) {
+          this.error = '❌ El email ya está registrado';
+        } else {
+          this.error = err.error?.error || '❌ Error al iniciar sesión';
+        }
       }
     });
   }

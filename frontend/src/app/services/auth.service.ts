@@ -9,7 +9,7 @@ export interface Usuario {
   rol?: string;
 }
 
-const API = 'http://localhost:3000/api';
+const API = '/api';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {

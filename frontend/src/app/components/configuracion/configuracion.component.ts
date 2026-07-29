@@ -103,7 +103,7 @@ export class ConfiguracionComponent implements OnInit {
     }
 
     this.cambiandoPassword = true;
-    this.http.put('http://localhost:3000/api/auth/password', {
+    this.http.put('/api/auth/password', {
       password_actual: this.passwordActual,
       password_nueva: this.passwordNueva
     }).subscribe({

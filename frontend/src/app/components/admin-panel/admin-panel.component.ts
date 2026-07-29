@@ -11,7 +11,7 @@ interface UsuarioAdmin {
   creado: string;
 }
 
-const API = 'http://localhost:3000/api';
+const API = '/api';
 
 @Component({
   selector: 'app-admin-panel',

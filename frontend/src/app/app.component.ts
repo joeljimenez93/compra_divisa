@@ -24,6 +24,15 @@ export class AppComponent implements OnInit {
 
   ngOnInit() {
     this.auth.usuario$.subscribe(u => this.usuario = u);
+    // Verificar token al iniciar - si expiró, redirigir al login
+    if (this.auth.isLoggedIn) {
+      this.auth.verificarToken().subscribe({
+        error: () => {
+          console.log('Token expirado o inválido, cerrando sesión');
+          this.auth.logout();
+        }
+      });
+    }
   }
 
   get isLoggedIn(): boolean {

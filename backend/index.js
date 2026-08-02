@@ -35,12 +35,45 @@ app.use(express.static(frontendPath));
 
 // ── Helpers ──────────────────────────────────────────────
 function leerDB() {
-  const raw = fs.readFileSync(DB_PATH, 'utf-8');
-  return JSON.parse(raw);
+  try {
+    if (!fs.existsSync(DB_PATH)) {
+      console.log('⚠️ data.json no existe, creando nuevo...');
+      const inicial = { usuarios: [], operaciones: [], config: { comision_zinli_porcentaje: 2.5, comision_divisas_porcentaje: 0.5, tasa_bcv_manual: null, tasa_binance_manual: null, margen_minimo_ganancia: 1.5, fecha_actualizacion: null } };
+      fs.writeFileSync(DB_PATH, JSON.stringify(inicial, null, 2), 'utf-8');
+      return inicial;
+    }
+    const raw = fs.readFileSync(DB_PATH, 'utf-8');
+    if (!raw || raw.trim() === '') {
+      throw new Error('data.json está vacío');
+    }
+    return JSON.parse(raw);
+  } catch (err) {
+    console.error('❌ Error al leer data.json:', err.message);
+    // Si hay error de parseo, respaldar el archivo dañado y crear uno nuevo
+    if (fs.existsSync(DB_PATH)) {
+      const backupPath = DB_PATH + '.backup-' + Date.now();
+      try {
+        fs.copyFileSync(DB_PATH, backupPath);
+        console.log('📋 Backup guardado en:', backupPath);
+      } catch (e) { /* no se pudo respaldar */ }
+    }
+    const inicial = { usuarios: [], operaciones: [], config: { comision_zinli_porcentaje: 2.5, comision_divisas_porcentaje: 0.5, tasa_bcv_manual: null, tasa_binance_manual: null, margen_minimo_ganancia: 1.5, fecha_actualizacion: null } };
+    fs.writeFileSync(DB_PATH, JSON.stringify(inicial, null, 2), 'utf-8');
+    console.log('📄 Nuevo data.json creado');
+    return inicial;
+  }
 }
 
 function guardarDB(data) {
-  fs.writeFileSync(DB_PATH, JSON.stringify(data, null, 2), 'utf-8');
+  try {
+    // Escribir primero a archivo temporal y luego renombrar (escritura atómica)
+    const tmpPath = DB_PATH + '.tmp';
+    fs.writeFileSync(tmpPath, JSON.stringify(data, null, 2), 'utf-8');
+    fs.renameSync(tmpPath, DB_PATH);
+  } catch (err) {
+    console.error('❌ Error al guardar data.json:', err.message);
+    throw err;
+  }
 }
 
 // ── Obtener tasas (múltiples fuentes) ────────────────────
@@ -446,29 +479,34 @@ app.post('/api/operaciones', async (req, res) => {
 
 // GET todas las operaciones
 app.get('/api/operaciones', (req, res) => {
-  const db = leerDB();
-  const operaciones = [...db.operaciones].reverse();
+  try {
+    const db = leerDB();
+    const operaciones = [...(db.operaciones || [])].reverse();
 
-  const totalUSD = operaciones.reduce((s, o) => s + o.monto_usd, 0);
-  const totalInvertido = operaciones.reduce((s, o) => s + (o.detalle.costo_bs || o.detalle.costo_total_bs || 0), 0);
-  const totalVendido = operaciones.reduce((s, o) => s + o.detalle.venta_binance_bs, 0);
-  const totalGanancia = operaciones.reduce((s, o) => s + o.detalle.ganancia_bs, 0);
-  const totalGananciaUSD = operaciones.reduce((s, o) => s + (o.detalle.ganancia_usd || 0), 0);
-  const gananciaPromedio = totalInvertido > 0 ? (totalGanancia / totalInvertido) * 100 : 0;
+    const totalUSD = operaciones.reduce((s, o) => s + (o.monto_usd || 0), 0);
+    const totalInvertido = operaciones.reduce((s, o) => s + (o.detalle?.costo_bs || o.detalle?.costo_total_bs || 0), 0);
+    const totalVendido = operaciones.reduce((s, o) => s + (o.detalle?.venta_binance_bs || 0), 0);
+    const totalGanancia = operaciones.reduce((s, o) => s + (o.detalle?.ganancia_bs || 0), 0);
+    const totalGananciaUSD = operaciones.reduce((s, o) => s + (o.detalle?.ganancia_usd || 0), 0);
+    const gananciaPromedio = totalInvertido > 0 ? (totalGanancia / totalInvertido) * 100 : 0;
 
-  res.json({
-    ok: true,
-    total_operaciones: operaciones.length,
-    resumen: {
-      total_usd_comprados: +totalUSD.toFixed(2),
-      total_bs_invertidos: +totalInvertido.toFixed(2),
-      total_bs_vendidos: +totalVendido.toFixed(2),
-      total_ganancia_bs: +totalGanancia.toFixed(2),
-      total_ganancia_usd: +totalGananciaUSD.toFixed(2),
-      ganancia_promedio_porcentaje: +gananciaPromedio.toFixed(2)
-    },
-    operaciones
-  });
+    res.json({
+      ok: true,
+      total_operaciones: operaciones.length,
+      resumen: {
+        total_usd_comprados: +totalUSD.toFixed(2),
+        total_bs_invertidos: +totalInvertido.toFixed(2),
+        total_bs_vendidos: +totalVendido.toFixed(2),
+        total_ganancia_bs: +totalGanancia.toFixed(2),
+        total_ganancia_usd: +totalGananciaUSD.toFixed(2),
+        ganancia_promedio_porcentaje: +gananciaPromedio.toFixed(2)
+      },
+      operaciones
+    });
+  } catch (err) {
+    console.error('❌ Error en GET /api/operaciones:', err.message);
+    res.status(500).json({ ok: false, error: 'Error al leer el historial: ' + err.message });
+  }
 });
 
 // GET operación por ID
@@ -513,9 +551,10 @@ app.put('/api/operaciones/:id', (req, res) => {
     op.comision_zinli_porcentaje = +comision_zinli_porcentaje;
   }
 
-  const tasaBcvEf = op.tasa_bcv * (1 + (op.comision_divisas_porcentaje || 0.5) / 100);
+  const comisionDivisasPct = op.comision_divisas_porcentaje != null ? op.comision_divisas_porcentaje : 0.5;
+  const tasaBcvEf = op.tasa_bcv * (1 + comisionDivisasPct / 100);
   const costoBaseBs = op.monto_usd * op.tasa_bcv;
-  const comisionDivBs = op.monto_usd * op.tasa_bcv * ((op.comision_divisas_porcentaje || 0.5) / 100);
+  const comisionDivBs = op.monto_usd * op.tasa_bcv * (comisionDivisasPct / 100);
   const costoBs = op.monto_usd * tasaBcvEf;
 
   // Zinli en USD: comision_zinli_bs ahora es comision_zinli_usd
@@ -564,7 +603,7 @@ app.put('/api/operaciones/:id', (req, res) => {
   // Actualizar flujo
   op.flujo = [
     { paso: 1, descripcion: 'Compra USD a tasa BCV', monto_usd: op.monto_usd, tasa: +op.tasa_bcv.toFixed(2), costo_bs: +costoBaseBs.toFixed(2), fuente: op.fuente_bcv },
-    { paso: 2, descripcion: 'Comisión adquisición divisas', porcentaje: (op.comision_divisas_porcentaje || 0.5), tasa_efectiva: +tasaBcvEf.toFixed(2), costo_bs: +comisionDivBs.toFixed(2) },
+    { paso: 2, descripcion: 'Comisión adquisición divisas', porcentaje: comisionDivisasPct, tasa_efectiva: +tasaBcvEf.toFixed(2), costo_bs: +comisionDivBs.toFixed(2) },
     { paso: 3, descripcion: 'Transferencia a Zinli', comision_porcentaje: op.comision_zinli_porcentaje, usd_recibidos: op.monto_usd, comision_usd: +comisionZinliUSD.toFixed(2), usd_restantes: +usdDisponible.toFixed(2) },
     { paso: 4, descripcion: 'Transferencia a Binance', usd_disponible: +usdDisponible.toFixed(2) },
     { paso: 5, descripcion: 'Venta en Binance P2P', usd: +usdDisponible.toFixed(2), tasa: +tasaBinanceEf.toFixed(2), ingreso_bs: +ventaBinanceBs.toFixed(2), fuente: venta_binance_bs !== undefined ? 'Manual (editado)' : op.fuente_binance },

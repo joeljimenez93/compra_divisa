@@ -1,7 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { HttpErrorResponse } from '@angular/common/http';
 import { ApiService, Operacion, OperacionesResponse } from '../../services/api.service';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-historial',
@@ -42,9 +44,17 @@ export class HistorialComponent implements OnInit {
         this.data = data;
         this.loading = false;
       },
-      error: () => {
-        this.error = 'Error al cargar historial';
+      error: (err: HttpErrorResponse) => {
         this.loading = false;
+        if (err.status === 401) {
+          this.error = '🔐 Sesión expirada. Por favor vuelve a iniciar sesión.';
+          // Cerrar sesión tras mostrar el error
+          setTimeout(() => this.auth.logout(), 2000);
+        } else if (err.status === 0) {
+          this.error = '⚠️ No se pudo conectar con el servidor. Verifica tu conexión.';
+        } else {
+          this.error = '❌ Error al cargar historial (' + (err.error?.error || err.message) + ')';
+        }
       }
     });
   }
@@ -53,7 +63,7 @@ export class HistorialComponent implements OnInit {
     this.operacionExpandida = this.operacionExpandida === id ? null : id;
   }
 
-  constructor(private api: ApiService) {}
+  constructor(private api: ApiService, private auth: AuthService) {}
 
   abrirEdicion(op: Operacion, event: Event) {
     event.stopPropagation();

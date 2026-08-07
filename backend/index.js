@@ -651,18 +651,34 @@ app.get('/api/config', (req, res) => {
   res.json({ ok: true, config: db.config });
 });
 
+// ── Error handler middleware ─────────────────────────────
+app.use((err, req, res, next) => {
+  console.error('❌ Error no manejado:', err.message);
+  console.error(err.stack);
+  res.status(500).json({ ok: false, error: 'Error interno del servidor' });
+});
+
 // ── Start ────────────────────────────────────────────────
 // Ruta catch-all para Angular (SPA)
 app.get('*', (req, res) => {
-  res.sendFile(path.join(frontendPath, 'index.html'));
+  const indexPath = path.join(frontendPath, 'index.html');
+  // Verificar que el archivo existe antes de enviarlo
+  if (require('fs').existsSync(indexPath)) {
+    res.sendFile(indexPath);
+  } else {
+    // Si no hay frontend, devolver 404 en JSON (solo API)
+    res.status(404).json({ ok: false, error: 'Ruta no encontrada', path: req.path });
+  }
 });
 
-app.listen(PORT, () => {
-  console.log(`🚀 Backend corriendo en http://localhost:${PORT}`);
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`🚀 Backend corriendo en http://0.0.0.0:${PORT}`);
+  console.log(`📁 Frontend: ${require('fs').existsSync(path.join(frontendPath, 'index.html')) ? '✅ ' + frontendPath : '❌ No encontrado'}`);
   console.log(`📊 Endpoints:`);
-  console.log(`   GET  /api/tasas        - Tasas actuales + simulación`);
-  console.log(`   GET  /api/operaciones   - Historial de operaciones`);
-  console.log(`   POST /api/operaciones   - Nueva compra (body: {monto_usd})`);
+  console.log(`   GET  /api/health        - Healthcheck`);
+  console.log(`   GET  /api/tasas          - Tasas actuales + simulación`);
+  console.log(`   GET  /api/operaciones    - Historial de operaciones`);
+  console.log(`   POST /api/operaciones    - Nueva compra (body: {monto_usd})`);
   console.log(`   GET  /api/operaciones/:id`);
   console.log(`   DELETE /api/operaciones/:id`);
   console.log(`   GET  /api/config         - Configuración`);

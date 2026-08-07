@@ -321,6 +321,28 @@ app.put('/api/admin/usuarios/:id', authMiddleware, adminMiddleware, (req, res) =
   res.json({ ok: true, mensaje: `Rol actualizado a ${rol}`, usuario: { id: usuario.id, nombre: usuario.nombre, email: usuario.email, rol: usuario.rol } });
 });
 
+// GET exportar todos los datos (admin)
+app.get('/api/admin/export', authMiddleware, adminMiddleware, (req, res) => {
+  const db = leerDB();
+  // Enmascarar contraseñas por seguridad
+  const exportData = {
+    exportado: new Date().toISOString(),
+    usuarios: db.usuarios.map(u => ({
+      id: u.id,
+      nombre: u.nombre,
+      email: u.email,
+      rol: u.rol || 'user',
+      creado: u.creado
+      // password NO incluida
+    })),
+    operaciones: db.operaciones,
+    config: db.config
+  };
+  res.setHeader('Content-Type', 'application/json');
+  res.setHeader('Content-Disposition', `attachment; filename="compra-dolares-backup-${new Date().toISOString().split('T')[0]}.json"`);
+  res.json(exportData);
+});
+
 // PUT cambiar contraseña (propio usuario)
 app.put('/api/auth/password', authMiddleware, async (req, res) => {
   const db = leerDB();

@@ -9,7 +9,7 @@ const bcrypt = require('bcryptjs');
 const app = express();
 const PORT = process.env.PORT || 3000;
 const DB_PATH = path.join(__dirname, 'data.json');
-const JWT_SECRET = process.env.JWT_SECRET || 'compra-dolares-secret-key-2026';
+const JWT_SECRET = process.env.JWT_SECRET || 'efe41d48c90d1655e81f4e7087e00946e1350d08e863bf7495a8a5a89b5afd74da0cb6637c11a3f174a8ad0ffbe58ae9';
 
 app.use(cors({
   origin: '*',

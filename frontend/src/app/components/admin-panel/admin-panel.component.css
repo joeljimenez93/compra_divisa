@@ -13,19 +13,37 @@
 h2 { font-size: 1.3rem; margin-bottom: 4px; color: #f8fafc; }
 .admin-desc { color: #94a3b8; font-size: 0.85rem; }
 
-.btn-download {
+.admin-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.btn-download, .btn-upload {
   padding: 10px 20px;
-  background: #1e3a5f;
-  border: 1px solid #3b82f6;
   border-radius: 10px;
-  color: #93c5fd;
   font-size: 0.85rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
   white-space: nowrap;
+  border: 1px solid #3b82f6;
+}
+
+.btn-download {
+  background: #1e3a5f;
+  color: #93c5fd;
 }
 .btn-download:hover { background: #3b82f6; color: white; }
+
+.btn-upload {
+  background: #1e293b;
+  color: #94a3b8;
+  border-color: #475569;
+  display: inline-block;
+}
+.btn-upload:hover { background: #334155; color: #e2e8f0; border-color: #22c55e; }
+.btn-upload.uploading { opacity: 0.6; cursor: not-allowed; }
 
 .loading { text-align: center; padding: 40px; color: #94a3b8; }
 .msg-ok {

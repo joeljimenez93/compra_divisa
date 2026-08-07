@@ -4,9 +4,15 @@
       <h2>🔑 Panel de Administración</h2>
       <p class="admin-desc">Gestiona los permisos de los usuarios registrados</p>
     </div>
-    <button class="btn-download" (click)="descargarDatos()" title="Descargar todos los datos como JSON">
-      📥 Descargar datos
-    </button>
+    <div class="admin-actions">
+      <button class="btn-download" (click)="descargarDatos()" title="Descargar todos los datos como JSON">
+        📥 Descargar
+      </button>
+      <label class="btn-upload" [class.uploading]="importando" title="Restaurar datos desde un archivo JSON">
+        {{ importando ? '⏳ Importando...' : '📤 Importar' }}
+        <input type="file" accept=".json" (change)="importarDatos($event)" [disabled]="importando" hidden />
+      </label>
+    </div>
   </div>
 
   <div *ngIf="loading" class="loading">⏳ Cargando usuarios...</div>

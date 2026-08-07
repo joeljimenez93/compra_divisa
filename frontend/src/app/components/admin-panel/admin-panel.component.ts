@@ -102,4 +102,52 @@ export class AdminPanelComponent implements OnInit {
       }
     });
   }
+
+  importando = false;
+
+  importarDatos(event: Event) {
+    const input = event.target as HTMLInputElement;
+    if (!input.files || !input.files[0]) return;
+
+    const file = input.files[0];
+    if (!file.name.endsWith('.json')) {
+      this.mensaje = '❌ Solo se permiten archivos .json';
+      setTimeout(() => this.mensaje = '', 3000);
+      return;
+    }
+
+    if (!confirm(`¿Restaurar datos desde "${file.name}"?\n\n⚠️ Esto REEMPLAZARÁ todas las operaciones y configuración actuales.`)) {
+      input.value = '';
+      return;
+    }
+
+    this.importando = true;
+    const reader = new FileReader();
+    reader.onload = () => {
+      try {
+        const datos = JSON.parse(reader.result as string);
+        this.http.post(`${API}/admin/import`, datos).subscribe({
+          next: (res: any) => {
+            this.importando = false;
+            this.mensaje = res.mensaje || '✅ Datos restaurados correctamente';
+            this.cargar();
+            setTimeout(() => this.mensaje = '', 5000);
+            input.value = '';
+          },
+          error: (err) => {
+            this.importando = false;
+            this.mensaje = '❌ ' + (err.error?.error || 'Error al importar');
+            setTimeout(() => this.mensaje = '', 5000);
+            input.value = '';
+          }
+        });
+      } catch {
+        this.importando = false;
+        this.mensaje = '❌ El archivo no es un JSON válido';
+        setTimeout(() => this.mensaje = '', 3000);
+        input.value = '';
+      }
+    };
+    reader.readAsText(file);
+  }
 }

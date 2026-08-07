@@ -4,16 +4,17 @@
       "id": 1785118720099,
       "nombre": "Joel",
       "email": "joel@gmail.com",
-      "password": "$2b$10$9IhyuEiDkM5lPQxrnOh2yuNyn1L1VgO9JxGcxzZLbadKmts/oJU/u",
-      "creado": "2026-07-27T02:18:40.099Z"
+      "rol": "user",
+      "creado": "2026-07-27T02:18:40.099Z",
+      "password": "$2b$10$9IhyuEiDkM5lPQxrnOh2yuNyn1L1VgO9JxGcxzZLbadKmts/oJU/u"
     },
     {
       "id": 1785118877090,
       "nombre": "joel jimenez",
       "email": "joeljim2293@gmail.com",
-      "password": "$2b$10$9IhyuEiDkM5lPQxrnOh2yuNyn1L1VgO9JxGcxzZLbadKmts/oJU/u",
+      "rol": "admin",
       "creado": "2026-07-27T02:21:17.090Z",
-      "rol": "admin"
+      "password": "$2b$10$9IhyuEiDkM5lPQxrnOh2yuNyn1L1VgO9JxGcxzZLbadKmts/oJU/u"
     }
   ],
   "operaciones": [
@@ -314,6 +315,6 @@
     "tasa_bcv_manual": null,
     "tasa_binance_manual": null,
     "margen_minimo_ganancia": 1.5,
-    "fecha_actualizacion": "2026-08-07T10:45:28.905Z"
+    "fecha_actualizacion": "2026-08-07T11:56:53.307Z"
   }
 }

@@ -343,6 +343,63 @@ app.get('/api/admin/export', authMiddleware, adminMiddleware, (req, res) => {
   res.json(exportData);
 });
 
+// POST importar datos desde JSON (admin)
+app.post('/api/admin/import', authMiddleware, adminMiddleware, async (req, res) => {
+  try {
+    const { usuarios, operaciones, config } = req.body;
+    
+    if (!operaciones || !Array.isArray(operaciones)) {
+      return res.status(400).json({ ok: false, error: 'El JSON debe tener un array "operaciones"' });
+    }
+    if (!config || typeof config !== 'object') {
+      return res.status(400).json({ ok: false, error: 'El JSON debe tener un objeto "config"' });
+    }
+
+    const dbActual = leerDB();
+    const mapaActual = new Map(dbActual.usuarios.map(u => [u.email, u]));
+
+    // Procesar usuarios: mantener contraseñas existentes, generar para nuevos
+    const usuariosImportados = (usuarios || []).map(u => {
+      const existente = mapaActual.get(u.email);
+      if (existente) {
+        // Mantener contraseña existente
+        return { ...u, password: existente.password, rol: u.rol || existente.rol || 'user' };
+      } else {
+        // Nuevo usuario: generar contraseña por defecto
+        const hash = bcrypt.hashSync('Admin2024!', 10);
+        return { ...u, password: hash, rol: u.rol || 'user' };
+      }
+    });
+
+    // Si no hay usuarios importados, mantener los actuales
+    const usuariosFinal = usuariosImportados.length > 0 ? usuariosImportados : dbActual.usuarios;
+
+    const nuevaDB = {
+      usuarios: usuariosFinal,
+      operaciones: operaciones,
+      config: {
+        comision_zinli_porcentaje: config.comision_zinli_porcentaje ?? dbActual.config.comision_zinli_porcentaje,
+        comision_divisas_porcentaje: config.comision_divisas_porcentaje ?? dbActual.config.comision_divisas_porcentaje,
+        tasa_bcv_manual: config.tasa_bcv_manual ?? dbActual.config.tasa_bcv_manual,
+        tasa_binance_manual: config.tasa_binance_manual ?? dbActual.config.tasa_binance_manual,
+        margen_minimo_ganancia: config.margen_minimo_ganancia ?? dbActual.config.margen_minimo_ganancia,
+        fecha_actualizacion: new Date().toISOString()
+      }
+    };
+
+    guardarDB(nuevaDB);
+    console.log(`📥 Datos importados: ${usuariosFinal.length} usuarios, ${operaciones.length} operaciones`);
+    res.json({ 
+      ok: true, 
+      mensaje: `✅ Importado: ${usuariosFinal.length} usuarios, ${operaciones.length} operaciones`,
+      resumen: { usuarios: usuariosFinal.length, operaciones: operaciones.length }
+    });
+  } catch (err) {
+    console.error('❌ Error al importar:', err.message);
+    res.status(500).json({ ok: false, error: 'Error al importar datos: ' + err.message });
+  }
+});
+
 // PUT cambiar contraseña (propio usuario)
 app.put('/api/auth/password', authMiddleware, async (req, res) => {
   const db = leerDB();

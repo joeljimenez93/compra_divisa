@@ -323,6 +323,11 @@ app.put('/api/auth/password', authMiddleware, async (req, res) => {
 app.use('/api/operaciones', authMiddleware);
 app.use('/api/config', authMiddleware);
 
+// Healthcheck rápido para Railway (sin depender de APIs externas)
+app.get('/api/health', (req, res) => {
+  res.json({ ok: true, status: 'healthy', timestamp: new Date().toISOString() });
+});
+
 // GET tasas actuales + simulación (pública)
 app.get('/api/tasas', async (req, res) => {
   try {

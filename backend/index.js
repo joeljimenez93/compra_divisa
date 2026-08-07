@@ -34,11 +34,29 @@ if (!frontendPath) {
 app.use(express.static(frontendPath));
 
 // ── Helpers ──────────────────────────────────────────────
+
+function crearAdminDefault(db) {
+  const bcrypt = require('bcryptjs');
+  const adminHash = bcrypt.hashSync('Admin2024!', 10);
+  const admin = {
+    id: Date.now(),
+    nombre: 'Admin',
+    email: 'admin@compradolares.com',
+    password: adminHash,
+    rol: 'admin',
+    creado: new Date().toISOString()
+  };
+  db.usuarios.push(admin);
+  console.log('👤 Admin por defecto creado: admin@compradolares.com / Admin2024!');
+  return db;
+}
+
 function leerDB() {
   try {
     if (!fs.existsSync(DB_PATH)) {
       console.log('⚠️ data.json no existe, creando nuevo...');
       const inicial = { usuarios: [], operaciones: [], config: { comision_zinli_porcentaje: 2.5, comision_divisas_porcentaje: 0.5, tasa_bcv_manual: null, tasa_binance_manual: null, margen_minimo_ganancia: 1.5, fecha_actualizacion: null } };
+      crearAdminDefault(inicial);
       fs.writeFileSync(DB_PATH, JSON.stringify(inicial, null, 2), 'utf-8');
       return inicial;
     }
@@ -46,7 +64,14 @@ function leerDB() {
     if (!raw || raw.trim() === '') {
       throw new Error('data.json está vacío');
     }
-    return JSON.parse(raw);
+    const db = JSON.parse(raw);
+    // Si no hay usuarios, crear admin por defecto
+    if (!db.usuarios || db.usuarios.length === 0) {
+      console.log('⚠️ data.json sin usuarios, creando admin por defecto...');
+      crearAdminDefault(db);
+      fs.writeFileSync(DB_PATH, JSON.stringify(db, null, 2), 'utf-8');
+    }
+    return db;
   } catch (err) {
     console.error('❌ Error al leer data.json:', err.message);
     // Si hay error de parseo, respaldar el archivo dañado y crear uno nuevo
@@ -58,6 +83,7 @@ function leerDB() {
       } catch (e) { /* no se pudo respaldar */ }
     }
     const inicial = { usuarios: [], operaciones: [], config: { comision_zinli_porcentaje: 2.5, comision_divisas_porcentaje: 0.5, tasa_bcv_manual: null, tasa_binance_manual: null, margen_minimo_ganancia: 1.5, fecha_actualizacion: null } };
+    crearAdminDefault(inicial);
     fs.writeFileSync(DB_PATH, JSON.stringify(inicial, null, 2), 'utf-8');
     console.log('📄 Nuevo data.json creado');
     return inicial;

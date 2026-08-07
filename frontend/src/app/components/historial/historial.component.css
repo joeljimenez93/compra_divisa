@@ -1,8 +1,29 @@
 .historial { animation: fadeIn 0.3s ease; }
 @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-.header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+.header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
 .header-row h2 { font-size: 1.3rem; color: #f8fafc; }
+
+/* Selector de Mes */
+.mes-selector {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+.mes-btn {
+  padding: 8px 16px;
+  background: #1e293b;
+  border: 1px solid #334155;
+  border-radius: 20px;
+  color: #94a3b8;
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.mes-btn:hover { border-color: #3b82f6; color: #e2e8f0; }
+.mes-btn.active { background: #3b82f6; border-color: #3b82f6; color: white; }
 
 .btn-refresh {
   padding: 8px 16px;

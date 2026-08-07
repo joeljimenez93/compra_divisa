@@ -5,6 +5,17 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { ApiService, Operacion, OperacionesResponse } from '../../services/api.service';
 import { AuthService } from '../../services/auth.service';
 
+interface MesInfo {
+  clave: string;       // '2026-08'
+  etiqueta: string;    // 'Agosto 2026'
+  usd: number;
+  invertido: number;
+  ganancia: number;
+  gananciaUsd: number;
+  promedio: number;
+  operaciones: number;
+}
+
 @Component({
   selector: 'app-historial',
   standalone: true,
@@ -27,6 +38,10 @@ export class HistorialComponent implements OnInit {
   guardandoEdit = false;
   mensajeEdit = '';
 
+  // Filtro por mes
+  meses: MesInfo[] = [];
+  mesSeleccionado: string = 'todos';  // 'todos' o clave '2026-08'
+
   // Calculadora
   calcVisible: string = '';  // 'zinli' o 'venta'
   calcExpresion: string = '';
@@ -42,6 +57,7 @@ export class HistorialComponent implements OnInit {
     this.api.getOperaciones().subscribe({
       next: (data) => {
         this.data = data;
+        this.calcularMeses();
         this.loading = false;
       },
       error: (err: HttpErrorResponse) => {
@@ -57,6 +73,70 @@ export class HistorialComponent implements OnInit {
         }
       }
     });
+  }
+
+  calcularMeses() {
+    if (!this.data || !this.data.operaciones.length) {
+      this.meses = [];
+      return;
+    }
+    const mapa = new Map<string, Operacion[]>();
+    for (const op of this.data.operaciones) {
+      const fecha = new Date(op.fecha);
+      const clave = `${fecha.getFullYear()}-${String(fecha.getMonth() + 1).padStart(2, '0')}`;
+      if (!mapa.has(clave)) mapa.set(clave, []);
+      mapa.get(clave)!.push(op);
+    }
+    // Ordenar por clave descendente (más reciente primero)
+    const claves = Array.from(mapa.keys()).sort((a, b) => b.localeCompare(a));
+    const NOMBRES_MESES = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+    
+    this.meses = claves.map(clave => {
+      const ops = mapa.get(clave)!;
+      const [anio, mes] = clave.split('-');
+      const usd = ops.reduce((s, o) => s + o.monto_usd, 0);
+      const invertido = ops.reduce((s, o) => s + (o.detalle.costo_base_bs || o.detalle.costo_bs || 0), 0);
+      const ganancia = ops.reduce((s, o) => s + (o.detalle.ganancia_bs || 0), 0);
+      const gananciaUsd = ops.reduce((s, o) => s + (o.detalle.ganancia_usd || 0), 0);
+      const promedio = invertido > 0 ? (ganancia / invertido) * 100 : 0;
+      return {
+        clave,
+        etiqueta: `${NOMBRES_MESES[parseInt(mes) - 1]} ${anio}`,
+        usd,
+        invertido,
+        ganancia,
+        gananciaUsd,
+        promedio,
+        operaciones: ops.length
+      };
+    });
+  }
+
+  get operacionesFiltradas(): Operacion[] {
+    if (!this.data) return [];
+    if (this.mesSeleccionado === 'todos') return this.data.operaciones;
+    return this.data.operaciones.filter(op => {
+      const fecha = new Date(op.fecha);
+      const clave = `${fecha.getFullYear()}-${String(fecha.getMonth() + 1).padStart(2, '0')}`;
+      return clave === this.mesSeleccionado;
+    });
+  }
+
+  get resumenFiltrado() {
+    const ops = this.operacionesFiltradas;
+    const usd = ops.reduce((s, o) => s + o.monto_usd, 0);
+    const invertido = ops.reduce((s, o) => s + (o.detalle.costo_base_bs || o.detalle.costo_bs || 0), 0);
+    const vendido = ops.reduce((s, o) => s + (o.detalle.venta_binance_bs || 0), 0);
+    const ganancia = ops.reduce((s, o) => s + (o.detalle.ganancia_bs || 0), 0);
+    const gananciaUsd = ops.reduce((s, o) => s + (o.detalle.ganancia_usd || 0), 0);
+    const promedio = invertido > 0 ? (ganancia / invertido) * 100 : 0;
+    return { usd, invertido, vendido, ganancia, gananciaUsd, promedio, operaciones: ops.length };
+  }
+
+  seleccionarMes(clave: string) {
+    this.mesSeleccionado = clave;
+    this.operacionExpandida = null;
+    this.editandoId = null;
   }
 
   toggleExpand(id: number) {

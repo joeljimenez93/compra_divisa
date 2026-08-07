@@ -7,32 +7,49 @@
   <div *ngIf="loading" class="loading">⏳ Cargando historial...</div>
   <div *ngIf="error" class="error-msg">⚠️ {{ error }}</div>
 
+  <!-- Selector de Mes -->
+  <div class="mes-selector" *ngIf="data && data.total_operaciones > 0">
+    <button
+      class="mes-btn"
+      [class.active]="mesSeleccionado === 'todos'"
+      (click)="seleccionarMes('todos')">
+      📅 Todos
+    </button>
+    <button
+      *ngFor="let mes of meses"
+      class="mes-btn"
+      [class.active]="mesSeleccionado === mes.clave"
+      (click)="seleccionarMes(mes.clave)">
+      {{ mes.etiqueta }}
+    </button>
+  </div>
+
   <!-- Resumen -->
   <div class="resumen-bar" *ngIf="data && data.total_operaciones > 0">
     <div class="rb-item">
-      <span class="rb-num">{{ data.total_operaciones }}</span>
+      <span class="rb-num">{{ resumenFiltrado.operaciones }}</span>
       <span class="rb-label">Operaciones</span>
     </div>
     <div class="rb-item">
-      <span class="rb-num">${{ data.resumen.total_usd_comprados.toLocaleString() }}</span>
+      <span class="rb-num">${{ resumenFiltrado.usd.toLocaleString() }}</span>
       <span class="rb-label">USD comprados</span>
     </div>
     <div class="rb-item">
-      <span class="rb-num">Bs {{ data.resumen.total_bs_invertidos.toLocaleString() }}</span>
+      <span class="rb-num">Bs {{ resumenFiltrado.invertido.toLocaleString() }}</span>
       <span class="rb-label">Invertido</span>
     </div>
     <div class="rb-item highlight">
-      <span class="rb-num" [class.text-green]="data.resumen.total_ganancia_bs >= 0" [class.text-red]="data.resumen.total_ganancia_bs < 0">
-        Bs {{ data.resumen.total_ganancia_bs.toLocaleString() }}
+      <span class="rb-num" [class.text-green]="resumenFiltrado.ganancia >= 0" [class.text-red]="resumenFiltrado.ganancia < 0">
+        Bs {{ resumenFiltrado.ganancia.toLocaleString() }}
       </span>
-      <span class="rb-num-small" [class.text-green]="data.resumen.total_ganancia_bs >= 0">
-        ≈ ${{ (data.resumen.total_ganancia_usd || 0).toFixed(2) }} USD
+      <span class="rb-num-small" [class.text-green]="resumenFiltrado.ganancia >= 0">
+        ≈ ${{ resumenFiltrado.gananciaUsd.toFixed(2) }} USD
       </span>
       <span class="rb-label">Ganancia total</span>
     </div>
     <div class="rb-item">
-      <span class="rb-num" [class.text-green]="data.resumen.ganancia_promedio_porcentaje >= 0">
-        {{ data.resumen.ganancia_promedio_porcentaje >= 0 ? '+' : '' }}{{ data.resumen.ganancia_promedio_porcentaje }}%
+      <span class="rb-num" [class.text-green]="resumenFiltrado.promedio >= 0" [class.text-red]="resumenFiltrado.promedio < 0">
+        {{ resumenFiltrado.promedio >= 0 ? '+' : '' }}{{ resumenFiltrado.promedio.toFixed(2) }}%
       </span>
       <span class="rb-label">Promedio</span>
     </div>
@@ -44,11 +61,16 @@
     <p class="empty-hint">Ve a "Nueva Operación" para crear una.</p>
   </div>
 
+  <!-- Sin operaciones en el mes seleccionado -->
+  <div *ngIf="data && data.total_operaciones > 0 && resumenFiltrado.operaciones === 0" class="empty">
+    <p>📭 No hay operaciones en {{ mesSeleccionado }}</p>
+  </div>
+
   <!-- Lista de operaciones -->
-  <div class="ops-list" *ngIf="data && data.total_operaciones > 0">
+  <div class="ops-list" *ngIf="data && resumenFiltrado.operaciones > 0">
     <div
       class="op-card"
-      *ngFor="let op of data.operaciones"
+      *ngFor="let op of operacionesFiltradas"
       [class.expanded]="operacionExpandida === op.id"
       (click)="toggleExpand(op.id)">
 
